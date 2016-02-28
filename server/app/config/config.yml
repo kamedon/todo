@@ -72,3 +72,10 @@ fos_user:
     firewall_name: main
     user_class: AppBundle\Entity\User
 
+fos_rest:
+  routing_loader:
+    default_format: json                            # All responses should be JSON formated
+#    include_format: false
+  view:
+    view_response_listener: force
+
