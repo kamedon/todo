@@ -1,4 +1,4 @@
-package com.kamedon.todo.service
+package com.kamedon.todo.builder
 
 import com.kamedon.todo.util.XUserAgentAuthorizationUtil
 import okhttp3.JavaNetCookieJar
@@ -7,8 +7,8 @@ import okhttp3.OkHttpClient
 /**
  * Created by kamedon on 2/29/16.
  */
-object ApiClientService {
-    fun createClient(api_token: String?): OkHttpClient {
+object ApiClientBuilder {
+    fun createApi(api_token: String?): OkHttpClient {
         return OkHttpClient.Builder()
                 .addInterceptor({
                     chain ->

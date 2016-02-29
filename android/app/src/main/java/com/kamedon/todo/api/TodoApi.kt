@@ -1,6 +1,7 @@
 package com.kamedon.todo.api
 
-import com.kamedon.todo.entity.*
+import com.kamedon.todo.entity.api.NewTaskQuery
+import com.kamedon.todo.entity.api.NewTaskResponse
 import com.kamedon.todo.entity.api.NewUserQuery
 import com.kamedon.todo.entity.api.NewUserResponse
 import retrofit2.http.Body
@@ -8,15 +9,21 @@ import retrofit2.http.POST
 import rx.Observable
 
 /**
- * Created by kamedon on 2/28/16.
+ * Created by kamedon on 2/29/16.
  */
-object UserApi {
+object TodoApi {
 
     val BASE_URL = "http://kamedon39.xyz";
 
-    interface Api {
+    interface TaskApi {
+        @POST("/api/tasks.json")
+        fun new(@Body user: NewTaskQuery): Observable<NewTaskResponse>
+    }
+
+    interface UserApi {
         @POST("/api/users.json")
         fun new(@Body user: NewUserQuery): Observable<NewUserResponse>
     }
+
 
 }

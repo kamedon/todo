@@ -15,4 +15,12 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="prompt_task">todo...</string>
+    <string name="action_register">登録</string>
+    <string name="welcome">Welcome!</string>
+    <string name="complete_register_task">Completed.</string>
+    <string name="hello">Hello</string>
+
+
+
 </resources>
