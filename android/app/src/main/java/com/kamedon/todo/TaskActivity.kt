@@ -1,17 +1,13 @@
 package com.kamedon.todo
 
 import android.content.Context
-import android.content.Intent
-import android.content.res.Resources
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import com.kamedon.todo.adapter.TaskListAdapter
 import com.kamedon.todo.anim.TaskFormAnimation
 import com.kamedon.todo.api.TodoApi
 import com.kamedon.todo.builder.ApiClientBuilder
@@ -19,27 +15,24 @@ import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.entity.Task
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
-import com.kamedon.todo.entity.api.NewUserResponse
 import com.kamedon.todo.service.ApiKeyService
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.content_task.*
-import kotlinx.android.synthetic.main.content_task.view.*
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener
 
 /**
  * Created by kamedon on 2/29/16.
  */
-class TaskActivity : AppCompatActivity() {
+class TaskActivity : RxAppCompatActivity() {
     lateinit var taskFormAnimation: TaskFormAnimation
 
     lateinit var api: TodoApi.TaskApi
-
-
     lateinit var inputMethodManager: InputMethodManager
+    lateinit var taskListAdapter: TaskListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,11 +48,14 @@ class TaskActivity : AppCompatActivity() {
         val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token)
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         api = TodoApiBuilder.buildTaskApi(client)
+        taskListAdapter = TaskListAdapter(layoutInflater, emptyList());
+        list.adapter = taskListAdapter
 
         btn_register.setOnClickListener {
             view ->
             inputMethodManager.hideSoftInputFromWindow(layout_register_form.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             api.new(NewTaskQuery(edit_task.text.toString()))
+                    .compose (bindToLifecycle<NewTaskResponse>())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(object : Subscriber<NewTaskResponse>() {
@@ -83,51 +79,18 @@ class TaskActivity : AppCompatActivity() {
         }
 
         ActionBarPullToRefresh.from(this)
-                // Mark All Children as pullable
-                .allChildrenArePullable()
-                // Set a OnRefreshListener
+                .theseChildrenArePullable(R.id.list)
                 .listener { view ->
-                    api.list()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(object : Subscriber<List<Task>>() {
-                                override fun onCompleted() {
-                                    ptr_layout.setRefreshComplete()
-                                }
-
-                                override fun onNext(response: List<Task>) {
-                                    response.forEach {
-                                        Log.d("api", "response:${it.toString()}");
-                                    }
-                                }
-
-                                override fun onError(e: Throwable?) {
-                                    Log.d("api", "ng:" + e?.message);
-                                    ptr_layout.setRefreshComplete()
-                                }
-                            }) ;
+                    updateList();
                 }
                 // Finally commit the setup to our PullToRefreshLayout
                 .setup(ptr_layout);
     }
 
-    override fun onStart() {
-        super.onStart()
-        api.list()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<List<Task>>() {
-                    override fun onCompleted() {
-                    }
 
-                    override fun onNext(response: List<Task>) {
-                    }
-
-                    override fun onError(e: Throwable?) {
-
-                        Log.d("api", "ng:" + e?.message);
-                    }
-                }) ;
+    override fun onResume() {
+        super.onResume()
+        updateList();
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -135,4 +98,30 @@ class TaskActivity : AppCompatActivity() {
         taskFormAnimation.init();
     }
 
+    private fun updateList() {
+        api.list()
+                .compose(bindToLifecycle<List<Task>>())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Subscriber<List<Task>>() {
+                    override fun onCompleted() {
+                        ptr_layout.setRefreshComplete()
+                    }
+
+                    override fun onNext(response: List<Task>) {
+                        taskListAdapter.list = response
+                        taskListAdapter.notifyDataSetChanged()
+                        empty.visibility = if (response.isEmpty()) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
+                        }
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        Log.d("api", "ng:" + e?.message);
+                        ptr_layout.setRefreshComplete()
+                    }
+                }) ;
+    }
 }
