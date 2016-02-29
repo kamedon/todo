@@ -62,9 +62,10 @@ class UserApiController extends RestController
             } catch (Exception $e) {
                 throw new HttpException(400, "New User is not valid.");
             }
+            $key = \Ramsey\Uuid\Uuid::uuid1()->toString();
             $apiKey = new ApiKey();
             $apiKey->setUser($user);
-            $apiKey->setToken(\Ramsey\Uuid\Uuid::uuid1()->toString());
+            $apiKey->setToken($key);
             $em = $this->getDoctrine()->getManager();
             $em->persist($apiKey);
             $em->flush();
@@ -74,7 +75,7 @@ class UserApiController extends RestController
                     'id' => $user->getId(),
                     'username' => $user->getUsername()
                 ],
-                'api_key' => $apiKey->getToken(),
+                'api_key' => $key,
                 'message' => "created new user"
             ];
         }
