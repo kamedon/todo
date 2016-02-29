@@ -56,6 +56,7 @@ class TaskActivity : RxAppCompatActivity() {
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         api = TodoApiBuilder.buildTaskApi(client)
         taskListAdapter = TaskListAdapter(layoutInflater, LinkedList());
+        taskListAdapter.onComplete = { task, complete -> Log.d("check", "${task.toString()}::${complete.toString()}") }
         list.adapter = taskListAdapter
 
         btn_register.setOnClickListener {
