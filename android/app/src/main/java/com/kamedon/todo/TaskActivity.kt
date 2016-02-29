@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.AbsListView
 import com.kamedon.todo.adapter.TaskListAdapter
 import com.kamedon.todo.anim.TaskFormAnimation
 import com.kamedon.todo.api.TodoApi
@@ -19,7 +20,9 @@ import com.kamedon.todo.service.ApiKeyService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.content_task.*
+import rx.Observable
 import rx.Subscriber
+import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
@@ -88,6 +91,20 @@ class TaskActivity : RxAppCompatActivity() {
                 }
                 // Finally commit the setup to our PullToRefreshLayout
                 .setup(ptr_layout);
+
+        list.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScrollStateChanged(p0: AbsListView?, p1: Int) {
+            }
+
+            //            AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount
+            override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
+                val process = subscription?.isUnsubscribed ?: false
+                val isLastItemVisible = totalItemCount == list.firstVisiblePosition + visibleItemCount;
+                if (isLastItemVisible && process) {
+                    updateList(page.incrementAndGet(), false)
+                }
+            }
+        })
     }
 
 
@@ -101,8 +118,12 @@ class TaskActivity : RxAppCompatActivity() {
         taskFormAnimation.init();
     }
 
+
+    var subscription: Subscription? = null
+
     private fun updateList(page: Int, clean: Boolean) {
-        api.list(page)
+        Log.d("page", "p :${page.toString()}");
+        subscription = api.list(page)
                 .compose(bindToLifecycle<List<Task>>())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
