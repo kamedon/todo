@@ -14,7 +14,7 @@ import java.util.*
  * Created by kamedon on 2/29/16.
  */
 class TaskListAdapter(val layoutInflater: LayoutInflater, var list: LinkedList<Task>) : BaseAdapter() {
-    var onComplete: (Task, Boolean) -> Unit = { task, complete -> }
+    var onComplete: (View, Task, Boolean) -> Unit = { view, task, complete -> }
 
     override fun getCount(): Int {
         return list.size
@@ -47,7 +47,7 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: LinkedList<T
         }
         var item = getItem(position);
         holder.textBody.text = item.body
-        holder.checkComplete.setOnCheckedChangeListener { compoundButton, b -> onComplete(getItem(position), true) }
+        holder.checkComplete.setOnCheckedChangeListener { compoundButton, b -> onComplete(compoundButton, getItem(position), true) }
         return layout
     }
 
