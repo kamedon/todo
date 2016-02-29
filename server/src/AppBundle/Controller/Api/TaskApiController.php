@@ -48,6 +48,8 @@ class TaskApiController extends RestController
                 "task" => [
                     "id" => $task->getId(),
                     "body" => $task->getBody(),
+                    "state" => $task->getState(),
+                    "createdAt" => $task->getCreatedAt(),
                 ],
                 "message" => "created task"
             ];
@@ -69,8 +71,15 @@ class TaskApiController extends RestController
      */
     public function getTasksAction(Request $request)
     {
-        $this->authUser();
-        return [];
+        $user = $this->authUser();
+        $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
+        $query = $repository->createQueryBuilder('t')
+            ->select(["t.id", "t.body", "t.state", "t.createdAt", "t.updatedAt"])
+            ->where('t.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('t.createdAt', 'DESC')
+            ->getQuery();
+        return $query->getResult();
     }
 
 }
