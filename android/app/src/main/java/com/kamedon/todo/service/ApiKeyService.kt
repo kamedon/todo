@@ -1,5 +1,6 @@
 package com.kamedon.todo.service
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.kamedon.todo.entity.ApiKey
@@ -9,7 +10,8 @@ import com.kamedon.todo.entity.ApiKey
  */
 
 object ApiKeyService {
-    val key_api_token: String = "key_api_token"
+    private val key_api_token: String = "key_api_token"
+    fun createSharedPreferences(context: Context) = context.getSharedPreferences("todo_app", Context.MODE_PRIVATE)
 
     fun updateApiKey(editor: SharedPreferences.Editor, apiKey: ApiKey) {
         editor.putString(key_api_token, Gson().toJson(apiKey))

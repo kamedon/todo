@@ -1,4 +1,4 @@
-package com.kamedon.todo.service
+package com.kamedon.todo.builder
 
 import com.kamedon.todo.api.TodoApi
 import okhttp3.OkHttpClient
@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 /**
  * Created by kamedon on 2/28/16.
  */
-object TodoApiService {
+object TodoApiBuilder {
     private fun createRetrofit(client: OkHttpClient) = Retrofit.Builder()
             .baseUrl(TodoApi.BASE_URL)
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -17,12 +17,12 @@ object TodoApiService {
             .client(client)
             .build()
 
-    fun createTaskApi(client: OkHttpClient): TodoApi.UserApi {
+    fun buildTaskApi(client: OkHttpClient): TodoApi.TaskApi{
         val retrofit = createRetrofit(client)
-        return  retrofit.create(TodoApi.UserApi::class.java);
+        return  retrofit.create(TodoApi.TaskApi::class.java);
     }
 
-    fun createUserApi(client: OkHttpClient): TodoApi.UserApi {
+    fun buildUserApi(client: OkHttpClient): TodoApi.UserApi {
         val retrofit = createRetrofit(client)
         return retrofit.create(TodoApi.UserApi::class.java);
     }
