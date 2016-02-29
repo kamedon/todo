@@ -32,6 +32,7 @@ class TaskFormAnimation(val view: View) {
 
                 override fun onAnimationEnd(p0: Animator?) {
                     isShow = false;
+                    view.visibility = View.GONE
                 }
 
                 override fun onAnimationCancel(p0: Animator?) {
@@ -47,6 +48,7 @@ class TaskFormAnimation(val view: View) {
             Log.d("anime", "hide");
             val y = layoutFormTop - topMargin;
             //                layout_register_form.y = -layoutFormBottom + topMargin;
+            view.visibility = View.VISIBLE
             view.animate().translationY(y).setListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
                 }
