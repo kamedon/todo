@@ -79,3 +79,8 @@ fos_rest:
   view:
     view_response_listener: force
 
+stof_doctrine_extensions:
+    orm:
+        default:
+            timestampable: true
+
