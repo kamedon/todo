@@ -48,6 +48,8 @@ class TaskApiController extends RestController
                 "task" => [
                     "id" => $task->getId(),
                     "body" => $task->getBody(),
+                    "state" => $task->getState(),
+                    "createdAt" => $task->getCreatedAt(),
                 ],
                 "message" => "created task"
             ];
@@ -57,6 +59,7 @@ class TaskApiController extends RestController
     }
 
     /**
+     *
      * @ApiDoc(
      *     description="タスク一覧",
      *     statusCodes={
@@ -64,13 +67,23 @@ class TaskApiController extends RestController
      *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
      *     }
      * )
+     * @param int $page
      * @param Request $request
      * @return array
      */
-    public function getTasksAction(Request $request)
+    public function getTasksAction($page = 1, Request $request)
     {
-        $this->authUser();
-        return [];
+        $user = $this->authUser();
+        $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
+        $query = $repository->createQueryBuilder('t')
+            ->select(["t.id", "t.body", "t.state", "t.createdAt", "t.updatedAt"])
+            ->where('t.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('t.createdAt', 'DESC')
+            ->setMaxResults(10)
+            ->setFirstResult(($page - 1) * 10 + 1)
+            ->getQuery();
+        return $query->getResult();
     }
 
 }
