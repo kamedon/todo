@@ -86,4 +86,32 @@ class TaskApiController extends RestController
         return $query->getResult();
     }
 
+    /**
+     *
+     * @ApiDoc(
+     *     description="タスク削除",
+     *     statusCodes={
+     *         200="delete complete",
+     *         400="taskの情報の不備"
+     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
+     *     }
+     * )
+     * @param int $id
+     * @return array
+     * @throws \HttpInvalidParamException
+     */
+    public function deleteTasksAction($id)
+    {
+        $user = $this->authUser();
+        $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
+        $task = $repository->find($id);
+        if ($task && $user->own($task)) {
+            $manager = $this->getDoctrine()->getManager();
+            $manager->remove($task);
+            $manager->flush();
+            return ["message" => "completed delete"];
+        }
+        throw new \HttpInvalidParamException("invalid task", 400);
+    }
+
 }
