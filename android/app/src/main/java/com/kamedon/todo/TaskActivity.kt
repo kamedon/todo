@@ -14,6 +14,7 @@ import com.kamedon.todo.api.TodoApi
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.entity.Task
+import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
 import com.kamedon.todo.service.ApiKeyService
@@ -56,6 +57,27 @@ class TaskActivity : RxAppCompatActivity() {
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         api = TodoApiBuilder.buildTaskApi(client)
         taskListAdapter = TaskListAdapter(layoutInflater, LinkedList());
+        taskListAdapter.onComplete = { view, task, complete ->
+            api.delete(task.id)
+                    .compose(bindToLifecycle<DeleteTaskResponse>())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : Subscriber<DeleteTaskResponse>() {
+                        override fun onCompleted() {
+                            Snackbar.make(view, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                        }
+
+                        override fun onNext(response: DeleteTaskResponse) {
+                            taskListAdapter.list.remove(task)
+                            taskListAdapter.notifyDataSetChanged()
+                        }
+
+                        override fun onError(e: Throwable?) {
+                            Log.d("api", "ng:" + e?.message);
+                        }
+                    }) ;
+
+        }
         list.adapter = taskListAdapter
 
         btn_register.setOnClickListener {
