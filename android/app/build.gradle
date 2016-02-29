@@ -1,21 +1,27 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "todo.com.kamedon.todo"
+        applicationId "com.kamedon.todo"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        buildConfigField("String", "X_USER_AGENT_AUTHORIZATION_TOKEN", "\"${X_USER_AGENT_AUTHORIZATION_TOKEN}\"")
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
     }
 }
 
@@ -24,4 +30,27 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.android.support:design:23.2.0'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile 'io.reactivex:rxandroid:+'
+    compile 'com.squareup.okhttp3:okhttp:3.+'
+    compile "com.squareup.okhttp3:okhttp-urlconnection:3.+"
+    compile('com.squareup.retrofit2:retrofit:2.+') {
+        exclude module: 'okhttp'
+    }
+    compile 'com.squareup.retrofit2:adapter-rxjava:+'
+    compile 'com.squareup.retrofit2:converter-gson:+'
+}
+
+buildscript {
+    ext.kotlin_version = '1.0.0'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
+    }
+}
+repositories {
+    mavenCentral()
 }
