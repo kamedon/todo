@@ -34,11 +34,18 @@ class User extends BaseUser
      */
     protected $tasks;
 
-
     public function __construct()
     {
         parent::__construct();
-        // your own logic
+    }
+
+    /**
+     * @param Task $task
+     * @return bool
+     */
+    public function own(Task $task)
+    {
+        return $task->getUser()->getId() === $this->getId();
     }
 
     /**
@@ -98,4 +105,5 @@ class User extends BaseUser
     {
         return $this->tasks;
     }
+
 }
