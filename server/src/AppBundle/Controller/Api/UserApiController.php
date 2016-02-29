@@ -9,6 +9,7 @@
 namespace AppBundle\Controller\Api;
 
 
+use AppBundle\Entity\ApiKey;
 use AppBundle\Entity\NewUserRequest;
 use AppBundle\Form\NewUserFormType;
 use AppBundle\Form\UserType;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Uuid;
+use Symfony\Component\Validator\Constraints\UuidValidator;
 
 class UserApiController extends RestController
 {
@@ -32,7 +35,7 @@ class UserApiController extends RestController
      *     description="ユーザ登録",
      *     statusCodes={
      *         200="Returned create token",
-     *         403="Header:X-User-Agent-Authorizationの認証失敗"
+     *         403="Header:X-User-Agent-Authorizationの認証失敗",
      *         400="登録ユーザの情報が間違っている"
      *     }
      * )
@@ -67,17 +70,21 @@ class UserApiController extends RestController
             try {
                 $userManager->updateUser($user);
             } catch (Exception $e) {
-//                return ["code" => 403, "message" => "db error", "data" => $request->getContent()];
                 throw new HttpException(400, "New User is not valid.");
-//                throw new HttpException(400, "New User is not valid.");
             }
+            $apiKey = new ApiKey();
+            $apiKey->setUser($user);
+            $apiKey->setToken(\Ramsey\Uuid\Uuid::uuid1()->toString());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($apiKey);
+            $em->flush();
 
             return [
                 'user' => [
                     'id' => $user->getId(),
                     'username' => $user->getUsername()
                 ],
-//                'api_key' => "",
+                'api_key' => $apiKey->getToken(),
                 'message' => "created new user"
             ];
         }

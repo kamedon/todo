@@ -24,9 +24,39 @@ class User extends BaseUser
      */
     protected $id;
 
+    /**
+     * @ORM\OneToOne(targetEntity="ApiKey", mappedBy="user", cascade={"persist"})
+     */
+    protected $apiKey;
+
+
     public function __construct()
     {
         parent::__construct();
         // your own logic
+    }
+
+    /**
+     * Set apiKey
+     *
+     * @param \AppBundle\Entity\ApiKey $apiKey
+     *
+     * @return User
+     */
+    public function setApiKey(\AppBundle\Entity\ApiKey $apiKey = null)
+    {
+        $this->apiKey = $apiKey;
+
+        return $this;
+    }
+
+    /**
+     * Get apiKey
+     *
+     * @return \AppBundle\Entity\ApiKey
+     */
+    public function getApiKey()
+    {
+        return $this->apiKey;
     }
 }
