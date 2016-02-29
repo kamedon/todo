@@ -38,6 +38,7 @@ class TaskActivity : RxAppCompatActivity() {
     lateinit var inputMethodManager: InputMethodManager
     lateinit var taskListAdapter: TaskListAdapter
     var page: AtomicInteger = AtomicInteger(1);
+    private var next: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,7 +101,7 @@ class TaskActivity : RxAppCompatActivity() {
             override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
                 val process = subscription?.isUnsubscribed ?: false
                 val isLastItemVisible = totalItemCount == list.firstVisiblePosition + visibleItemCount;
-                if (isLastItemVisible && process) {
+                if (isLastItemVisible && process && next) {
                     updateList(page.incrementAndGet(), false)
                 }
             }
@@ -110,6 +111,7 @@ class TaskActivity : RxAppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        page.set(1);
         updateList(page.get(), true);
     }
 
@@ -132,6 +134,7 @@ class TaskActivity : RxAppCompatActivity() {
                         ptr_layout.setRefreshComplete()
                     }
 
+
                     override fun onNext(response: List<Task>) {
                         if (clean) {
                             taskListAdapter.list = response.toMutableList()
@@ -144,6 +147,7 @@ class TaskActivity : RxAppCompatActivity() {
                         } else {
                             View.GONE
                         }
+                        next = response.size >= 10;
                     }
 
                     override fun onError(e: Throwable?) {
