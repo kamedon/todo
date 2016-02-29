@@ -1,15 +1,14 @@
 package com.kamedon.todo.entity.api
 
 import com.kamedon.todo.entity.ApiKey
+import com.kamedon.todo.entity.Task
 import com.kamedon.todo.entity.User
 import java.io.Serializable
 
-
 /**
- *
  * ユーザ登録データ
  */
-data class NewUserQuery(val username: String, val email: String, val plainPassword: String) : Serializable
+data class NewTaskQuery(val body: String) : Serializable
 
 /**
  * ユーザ登録のレスとポンス
@@ -25,4 +24,4 @@ data class NewUserQuery(val username: String, val email: String, val plainPasswo
  *   "message": "created new user"
  * }
  */
-data class NewUserResponse(val user: User, val api_key: ApiKey, val message: String) : Serializable
+data class NewTaskResponse(val task: Task, val message: String) : Serializable

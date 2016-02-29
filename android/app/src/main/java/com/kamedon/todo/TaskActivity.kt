@@ -29,6 +29,11 @@ class TaskActivity : AppCompatActivity() {
         btn_toggle_task.setOnClickListener {
             taskFormAnimation.toggle();
         }
+
+        btn_register.setOnClickListener{
+
+
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
