@@ -1,0 +1,7 @@
+AppBundle\Entity\User:
+    properties:
+        username:
+            - NotBlank: ~
+        emal:
+            - NotBlank: ~
+            - Type: \Email
