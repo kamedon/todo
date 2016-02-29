@@ -47,7 +47,8 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: LinkedList<T
         }
         var item = getItem(position);
         holder.textBody.text = item.body
-        holder.checkComplete.setOnCheckedChangeListener { compoundButton, b -> onComplete(compoundButton, getItem(position), true) }
+        holder.checkComplete.isChecked = !item.state.equals("untreated")
+        holder.checkComplete.setOnCheckedChangeListener { compoundButton, b -> onComplete(compoundButton, item, true) }
         return layout
     }
 
