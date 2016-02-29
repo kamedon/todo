@@ -92,7 +92,7 @@ class TaskApiController extends RestController
      *     description="タスク削除",
      *     statusCodes={
      *         200="delete complete",
-     *         400="taskの情報の不備"
+     *         400="taskの情報の不備",
      *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
      *     }
      * )
