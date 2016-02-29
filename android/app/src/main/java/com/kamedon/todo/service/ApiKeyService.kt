@@ -16,5 +16,6 @@ object ApiKeyService {
         editor.apply();
     }
 
+    fun hasApiKey(sharedPreferences: SharedPreferences): Boolean = !sharedPreferences.getString(key_api_token, "").equals("")
     fun getApiKey(sharedPreferences: SharedPreferences): ApiKey = Gson().fromJson(sharedPreferences.getString(key_api_token, "").toString(), ApiKey::class.java)
 }
