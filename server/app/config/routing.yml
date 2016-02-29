@@ -5,3 +5,12 @@ app:
 fos_user:
     resource: "@FOSUserBundle/Resources/config/routing/all.xml"
 
+rest_auth:
+    resource: "@AppBundle/Controller/Api/AuthApiController.php"
+    type:     rest
+    prefix:   /api
+
+rest_user:
+    resource: "@AppBundle/Controller/Api/UserApiController.php"
+    type:     rest
+    prefix:   /api

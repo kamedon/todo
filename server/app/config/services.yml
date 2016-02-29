@@ -3,7 +3,8 @@
 parameters:
 #    parameter_name: value
 
+
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    auth_rest_service:
+        class: AppBundle\Service\AuthRestService
+        arguments: ["@request_stack", %x_useragent_authorization%]
