@@ -11,7 +11,7 @@ import com.kamedon.todo.entity.Task
 /**
  * Created by kamedon on 2/29/16.
  */
-class TaskListAdapter(val layoutInflater: LayoutInflater, var list: List<Task>) : BaseAdapter() {
+class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<Task>) : BaseAdapter() {
 
 
     override fun getCount(): Int {

@@ -23,6 +23,7 @@ import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by kamedon on 2/29/16.
@@ -33,6 +34,7 @@ class TaskActivity : RxAppCompatActivity() {
     lateinit var api: TodoApi.TaskApi
     lateinit var inputMethodManager: InputMethodManager
     lateinit var taskListAdapter: TaskListAdapter
+    var page: AtomicInteger = AtomicInteger(1);
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +50,7 @@ class TaskActivity : RxAppCompatActivity() {
         val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token)
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         api = TodoApiBuilder.buildTaskApi(client)
-        taskListAdapter = TaskListAdapter(layoutInflater, emptyList());
+        taskListAdapter = TaskListAdapter(layoutInflater, mutableListOf());
         list.adapter = taskListAdapter
 
         btn_register.setOnClickListener {
@@ -81,7 +83,8 @@ class TaskActivity : RxAppCompatActivity() {
         ActionBarPullToRefresh.from(this)
                 .theseChildrenArePullable(R.id.list)
                 .listener { view ->
-                    updateList();
+                    page.set(1)
+                    updateList(1, true);
                 }
                 // Finally commit the setup to our PullToRefreshLayout
                 .setup(ptr_layout);
@@ -90,7 +93,7 @@ class TaskActivity : RxAppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        updateList();
+        updateList(page.get(), true);
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -98,8 +101,8 @@ class TaskActivity : RxAppCompatActivity() {
         taskFormAnimation.init();
     }
 
-    private fun updateList() {
-        api.list()
+    private fun updateList(page: Int, clean: Boolean) {
+        api.list(page)
                 .compose(bindToLifecycle<List<Task>>())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -109,9 +112,13 @@ class TaskActivity : RxAppCompatActivity() {
                     }
 
                     override fun onNext(response: List<Task>) {
-                        taskListAdapter.list = response
+                        if (clean) {
+                            taskListAdapter.list = response.toMutableList()
+                        } else {
+                            taskListAdapter.list.addAll(response)
+                        }
                         taskListAdapter.notifyDataSetChanged()
-                        empty.visibility = if (response.isEmpty()) {
+                        empty.visibility = if (taskListAdapter.isEmpty) {
                             View.VISIBLE
                         } else {
                             View.GONE

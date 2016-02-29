@@ -59,6 +59,7 @@ class TaskApiController extends RestController
     }
 
     /**
+     *
      * @ApiDoc(
      *     description="タスク一覧",
      *     statusCodes={
@@ -66,10 +67,11 @@ class TaskApiController extends RestController
      *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
      *     }
      * )
+     * @param int $page
      * @param Request $request
      * @return array
      */
-    public function getTasksAction(Request $request)
+    public function getTasksAction($page = 1, Request $request)
     {
         $user = $this->authUser();
         $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
@@ -78,6 +80,8 @@ class TaskApiController extends RestController
             ->where('t.user = :user')
             ->setParameter('user', $user)
             ->orderBy('t.createdAt', 'DESC')
+            ->setMaxResults(10)
+            ->setFirstResult($page)
             ->getQuery();
         return $query->getResult();
     }
