@@ -9,8 +9,11 @@
 namespace AppBundle\Controller\Api;
 
 
+use AppBundle\Entity\Task;
+use AppBundle\Form\TaskFormType;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Constraints\UuidValidator;
 
 class TaskApiController extends RestController
@@ -30,7 +33,27 @@ class TaskApiController extends RestController
     public function postTasksAction(Request $request)
     {
         $user = $this->authUser();
-
+        $task = new Task();
+        $task->setUser($user);
+        $form = $this->get('form.factory')->createNamed('', TaskFormType::class, $task, [
+            'method' => 'POST',
+            'csrf_protection' => false,
+        ]);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($task);
+            $manager->flush();
+            return [
+                "task" => [
+                    "id" => $task->getId(),
+                    "body" => $task->getBody(),
+                ],
+                "message" => "created task"
+            ];
+        }
+//        return [$form->getErrors()];
+        throw new HttpException(400, "invalid task");
     }
 
     /**

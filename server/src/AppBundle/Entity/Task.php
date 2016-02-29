@@ -39,8 +39,18 @@ class Task
     private $body;
 
     /**
+     * @var string
+     * @Assert\NotBlank()
+     * @Assert\Choice(choices = {"untreated","process", "complete"}, message = "Choose a valid state.")
+     *
+     * @ORM\Column(name="state", type="string", length=16)
+     */
+
+    private $state = "untreated";
+    /**
      * @var \DateTime
      *
+     * @Gedmo\Timestampable(on="create")
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
@@ -48,16 +58,10 @@ class Task
     /**
      * @var \DateTime
      *
+     * @Gedmo\Timestampable(on="update")
      * @ORM\Column(name="updated_at", type="datetime")
      */
     private $updatedAt;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="state", type="string", length=255)
-     */
-    private $state;
 
 
     /**
@@ -165,5 +169,28 @@ class Task
     {
         return $this->state;
     }
-}
 
+    /**
+     * Set user
+     *
+     * @param \AppBundle\Entity\User $user
+     *
+     * @return Task
+     */
+    public function setUser(\AppBundle\Entity\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+}

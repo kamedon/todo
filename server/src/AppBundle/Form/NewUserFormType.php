@@ -17,7 +17,7 @@ class NewUserFormType extends AbstractType
         $builder
             ->add('email')
             ->add('username')
-            ->add('plainPassword');
+            ->add('plainPassword', PasswordType::class);
 //        $builder
 //            ->add('email', EmailType::class)
 //            ->add('username', TextType::class)
