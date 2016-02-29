@@ -9,6 +9,7 @@
 namespace AppBundle\Controller\Api;
 
 
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\UuidValidator;
 
@@ -20,7 +21,7 @@ class TaskApiController extends RestController
      *     description="タスク登録",
      *     statusCodes={
      *         200="created task",
-     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗",
+     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
      *     }
      * )
      * @param Request $request
@@ -28,7 +29,8 @@ class TaskApiController extends RestController
      */
     public function postTasksAction(Request $request)
     {
-        return [];
+        $user = $this->authUser();
+
     }
 
     /**
@@ -36,7 +38,7 @@ class TaskApiController extends RestController
      *     description="タスク一覧",
      *     statusCodes={
      *         200="list task",
-     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗",
+     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
      *     }
      * )
      * @param Request $request
@@ -44,6 +46,8 @@ class TaskApiController extends RestController
      */
     public function getTasksAction(Request $request)
     {
+        $this->authUser();
         return [];
     }
+
 }

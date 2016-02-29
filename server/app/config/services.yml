@@ -7,4 +7,4 @@ parameters:
 services:
     auth_rest_service:
         class: AppBundle\Service\AuthRestService
-        arguments: ["@request_stack", %x_useragent_authorization%]
+        arguments: ["@request_stack","@doctrine", %x_useragent_authorization%]
