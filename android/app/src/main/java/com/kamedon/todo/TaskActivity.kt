@@ -27,6 +27,8 @@ import kotlinx.android.synthetic.main.content_task.view.*
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener
 
 /**
  * Created by kamedon on 2/29/16.
@@ -67,7 +69,6 @@ class TaskActivity : AppCompatActivity() {
                         }
 
                         override fun onNext(response: NewTaskResponse) {
-                            Log.d("api", "response:${response.toString()}");
                         }
 
                         override fun onError(e: Throwable?) {
@@ -80,6 +81,34 @@ class TaskActivity : AppCompatActivity() {
             "new" -> Snackbar.make(layout_register_form, R.string.welcome, Snackbar.LENGTH_LONG).setAction("Action", null).show()
             "" -> Snackbar.make(layout_register_form, R.string.hello, Snackbar.LENGTH_LONG).setAction("Action", null).show()
         }
+
+        ActionBarPullToRefresh.from(this)
+                // Mark All Children as pullable
+                .allChildrenArePullable()
+                // Set a OnRefreshListener
+                .listener { view ->
+                    api.list()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(object : Subscriber<List<Task>>() {
+                                override fun onCompleted() {
+                                    ptr_layout.setRefreshComplete()
+                                }
+
+                                override fun onNext(response: List<Task>) {
+                                    response.forEach {
+                                        Log.d("api", "response:${it.toString()}");
+                                    }
+                                }
+
+                                override fun onError(e: Throwable?) {
+                                    Log.d("api", "ng:" + e?.message);
+                                    ptr_layout.setRefreshComplete()
+                                }
+                            }) ;
+                }
+                // Finally commit the setup to our PullToRefreshLayout
+                .setup(ptr_layout);
     }
 
     override fun onStart() {
@@ -92,9 +121,6 @@ class TaskActivity : AppCompatActivity() {
                     }
 
                     override fun onNext(response: List<Task>) {
-                        response.forEach {
-                            Log.d("api", "response:${it.toString()}");
-                        }
                     }
 
                     override fun onError(e: Throwable?) {
