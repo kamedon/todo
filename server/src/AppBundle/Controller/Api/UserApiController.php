@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: kamedon
  * Date: 2/29/16
- * Time: 8:59 AM
+ * Time: 9:14 AM
  */
 
 namespace AppBundle\Controller\Api;
@@ -13,7 +13,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-class AuthApiController extends RestController
+class UserApiController extends RestController
 {
     /**
      * @ApiDoc(
@@ -26,11 +26,11 @@ class AuthApiController extends RestController
      * @param Request $request
      * @return array
      */
-    public function postTokensAction(Request $request)
+    public function postUsersAction(Request $request)
     {
         $this->auth();
-        return ["ok"];
     }
+
 
 
 }
