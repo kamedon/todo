@@ -41,7 +41,9 @@ class MainActivity : AppCompatActivity() {
                     .subscribe(object : Subscriber<NewUserResponse>() {
                         override fun onCompleted() {
                             Log.d("api", "onCompleted");
-                            startActivity(Intent(applicationContext, TaskActivity::class.java));
+                            val intent = Intent(applicationContext, TaskActivity::class.java)
+                            intent.putExtra("user", "new");
+                            startActivity(intent);
                             finish();
                         }
 
