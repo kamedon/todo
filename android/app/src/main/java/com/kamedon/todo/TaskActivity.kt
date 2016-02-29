@@ -16,6 +16,7 @@ import com.kamedon.todo.anim.TaskFormAnimation
 import com.kamedon.todo.api.TodoApi
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
+import com.kamedon.todo.entity.Task
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
 import com.kamedon.todo.entity.api.NewUserResponse
@@ -79,6 +80,28 @@ class TaskActivity : AppCompatActivity() {
             "new" -> Snackbar.make(layout_register_form, R.string.welcome, Snackbar.LENGTH_LONG).setAction("Action", null).show()
             "" -> Snackbar.make(layout_register_form, R.string.hello, Snackbar.LENGTH_LONG).setAction("Action", null).show()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        api.list()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Subscriber<List<Task>>() {
+                    override fun onCompleted() {
+                    }
+
+                    override fun onNext(response: List<Task>) {
+                        response.forEach {
+                            Log.d("api", "response:${it.toString()}");
+                        }
+                    }
+
+                    override fun onError(e: Throwable?) {
+
+                        Log.d("api", "ng:" + e?.message);
+                    }
+                }) ;
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
