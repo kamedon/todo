@@ -61,7 +61,6 @@ class AuthRestService
             return $apiKey->getUser();
         }
         throw new AccessDeniedException("invalid request");
-
     }
 
 }

@@ -29,6 +29,11 @@ class User extends BaseUser
      */
     protected $apiKey;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="user")
+     */
+    protected $tasks;
+
 
     public function __construct()
     {
