@@ -7,11 +7,12 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.kamedon.todo.R
 import com.kamedon.todo.entity.Task
+import java.util.*
 
 /**
  * Created by kamedon on 2/29/16.
  */
-class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<Task>) : BaseAdapter() {
+class TaskListAdapter(val layoutInflater: LayoutInflater, var list: LinkedList<Task>) : BaseAdapter() {
 
 
     override fun getCount(): Int {

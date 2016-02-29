@@ -26,6 +26,7 @@ import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -54,7 +55,7 @@ class TaskActivity : RxAppCompatActivity() {
         val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token)
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         api = TodoApiBuilder.buildTaskApi(client)
-        taskListAdapter = TaskListAdapter(layoutInflater, mutableListOf());
+        taskListAdapter = TaskListAdapter(layoutInflater, LinkedList());
         list.adapter = taskListAdapter
 
         btn_register.setOnClickListener {
@@ -71,6 +72,7 @@ class TaskActivity : RxAppCompatActivity() {
                         }
 
                         override fun onNext(response: NewTaskResponse) {
+                            taskListAdapter.list.addFirst(response.task)
                         }
 
                         override fun onError(e: Throwable?) {
@@ -137,9 +139,9 @@ class TaskActivity : RxAppCompatActivity() {
 
                     override fun onNext(response: List<Task>) {
                         if (clean) {
-                            taskListAdapter.list = response.toMutableList()
+                            taskListAdapter.list = LinkedList(response)
                         } else {
-                            taskListAdapter.list.addAll(response)
+                            taskListAdapter.list.addAll(taskListAdapter.list.lastIndex, response)
                         }
                         taskListAdapter.notifyDataSetChanged()
                         empty.visibility = if (taskListAdapter.isEmpty) {
