@@ -13,7 +13,7 @@ import java.util.*
 /**
  * Created by kamedon on 2/29/16.
  */
-class TaskListAdapter(val layoutInflater: LayoutInflater, var list: LinkedList<Task>) : BaseAdapter() {
+class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<Task>) : BaseAdapter() {
     var onComplete: (View, Task, Boolean) -> Unit = { view, task, complete -> }
 
     override fun getCount(): Int {

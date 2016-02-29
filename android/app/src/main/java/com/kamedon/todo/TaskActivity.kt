@@ -28,6 +28,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -56,7 +57,7 @@ class TaskActivity : RxAppCompatActivity() {
         val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token)
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         api = TodoApiBuilder.buildTaskApi(client)
-        taskListAdapter = TaskListAdapter(layoutInflater, LinkedList());
+        taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
         taskListAdapter.onComplete = { view, task, complete ->
             api.delete(task.id)
                     .compose(bindToLifecycle<DeleteTaskResponse>())
@@ -94,7 +95,7 @@ class TaskActivity : RxAppCompatActivity() {
                         }
 
                         override fun onNext(response: NewTaskResponse) {
-                            taskListAdapter.list.addFirst(response.task)
+                            taskListAdapter.list.add(0, response.task)
                         }
 
                         override fun onError(e: Throwable?) {
@@ -148,7 +149,6 @@ class TaskActivity : RxAppCompatActivity() {
     var subscription: Subscription? = null
 
     private fun updateList(page: Int, clean: Boolean) {
-        Log.d("page", "p :${page.toString()}");
         subscription = api.list(page)
                 .compose(bindToLifecycle<List<Task>>())
                 .subscribeOn(Schedulers.io())
@@ -161,7 +161,7 @@ class TaskActivity : RxAppCompatActivity() {
 
                     override fun onNext(response: List<Task>) {
                         if (clean) {
-                            taskListAdapter.list = LinkedList(response)
+                            taskListAdapter.list = CopyOnWriteArrayList(response)
                         } else {
                             taskListAdapter.list.addAll(taskListAdapter.list.lastIndex, response)
                         }
