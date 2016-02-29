@@ -4,7 +4,6 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Ramsey\Uuid\Uuid;
 
 /**
  * ApiKey
@@ -72,8 +71,7 @@ class ApiKey
      */
     public function setToken($token)
     {
-        $this->token = $token;
-
+        $this->token = hash_hmac('sha256', $token, false);
         return $this;
     }
 

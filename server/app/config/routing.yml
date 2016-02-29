@@ -14,3 +14,8 @@ rest_user:
     resource: "@AppBundle/Controller/Api/UserApiController.php"
     type:     rest
     prefix:   /api
+
+rest_task:
+    resource: "@AppBundle/Controller/Api/TaskApiController.php"
+    type:     rest
+    prefix:   /api

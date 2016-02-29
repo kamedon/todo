@@ -8,7 +8,6 @@
 
 namespace AppBundle\Entity;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Security\Core\Validator\Constraints as SecurityAssert;
 
 
 class NewUserRequest

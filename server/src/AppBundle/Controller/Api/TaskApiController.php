@@ -1,0 +1,76 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: kamedon
+ * Date: 2/29/16
+ * Time: 11:24 AM
+ */
+
+namespace AppBundle\Controller\Api;
+
+
+use AppBundle\Entity\Task;
+use AppBundle\Form\TaskFormType;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Validator\Constraints\UuidValidator;
+
+class TaskApiController extends RestController
+{
+
+    /**
+     * @ApiDoc(
+     *     description="タスク登録",
+     *     statusCodes={
+     *         200="created task",
+     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
+     *     }
+     * )
+     * @param Request $request
+     * @return array
+     */
+    public function postTasksAction(Request $request)
+    {
+        $user = $this->authUser();
+        $task = new Task();
+        $task->setUser($user);
+        $form = $this->get('form.factory')->createNamed('', TaskFormType::class, $task, [
+            'method' => 'POST',
+            'csrf_protection' => false,
+        ]);
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($task);
+            $manager->flush();
+            return [
+                "task" => [
+                    "id" => $task->getId(),
+                    "body" => $task->getBody(),
+                ],
+                "message" => "created task"
+            ];
+        }
+//        return [$form->getErrors()];
+        throw new HttpException(400, "invalid task");
+    }
+
+    /**
+     * @ApiDoc(
+     *     description="タスク一覧",
+     *     statusCodes={
+     *         200="list task",
+     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
+     *     }
+     * )
+     * @param Request $request
+     * @return array
+     */
+    public function getTasksAction(Request $request)
+    {
+        $this->authUser();
+        return [];
+    }
+
+}
