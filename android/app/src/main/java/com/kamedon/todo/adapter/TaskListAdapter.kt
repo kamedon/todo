@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.CheckBox
 import android.widget.TextView
 import com.kamedon.todo.R
 import com.kamedon.todo.entity.Task
@@ -46,6 +47,7 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: LinkedList<T
         }
         var item = getItem(position);
         holder.textBody.text = item.body
+        holder.checkComplete.setOnCheckedChangeListener { compoundButton, b -> }
         return layout
     }
 
@@ -54,9 +56,11 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: LinkedList<T
 
 private class ViewHolder(var view: View) {
     var textBody: TextView
+    var checkComplete: CheckBox
 
     init {
         textBody = view.findViewById(R.id.text_body) as TextView
+        checkComplete = view.findViewById(R.id.checkbox_complete) as CheckBox
     }
 
 }

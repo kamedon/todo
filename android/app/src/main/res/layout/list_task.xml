@@ -6,10 +6,18 @@
     android:paddingRight="@dimen/list_horizontal_margin"
     android:paddingTop="@dimen/list_vertical_margin">
 
+    <CheckBox
+        android:id="@+id/checkbox_complete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true" />
+
     <TextView
         android:id="@+id/text_body"
         style="?android:textAppearanceSmall"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/checkbox_complete" />
 
 </RelativeLayout>
