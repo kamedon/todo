@@ -11,6 +11,7 @@ import com.kamedon.todo.entity.api.NewUserResponse
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.service.ApiKeyService
 import com.kamedon.todo.builder.TodoApiBuilder
+import com.kamedon.todo.entity.api.LoginUserApiData
 import kotlinx.android.synthetic.main.activity_main.*
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
@@ -34,6 +35,31 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main);
         val client = ApiClientBuilder.createApi(null, null);
         val api = TodoApiBuilder.buildUserApi(client);
+        btn_login.setOnClickListener {
+            api.login(LoginUserApiData(edit_username.text.toString(), edit_password.text.toString()))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : Subscriber<NewUserResponse>() {
+                        override fun onCompleted() {
+                            Log.d("api", "onCompleted");
+                            val intent = Intent(applicationContext, TaskActivity::class.java)
+                            intent.putExtra("user", "new");
+                            startActivity(intent);
+                            finish();
+                        }
+
+                        override fun onNext(response: NewUserResponse) {
+                            Log.d("api", "response:${response.toString()}");
+                            ApiKeyService.updateApiKey(perf.edit(), response.api_key)
+                        }
+
+                        override fun onError(e: Throwable?) {
+
+                            Log.d("api", "ng:" + e?.message);
+                        }
+                    }) ;
+        }
+
         btn_signIn.setOnClickListener {
             api.new(NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString()))
                     .subscribeOn(Schedulers.io())

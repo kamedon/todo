@@ -83,5 +83,53 @@ class UserApiController extends RestController
 
     }
 
+    /**
+     * @ApiDoc(
+     *     description="ユーザ登録",
+     *     statusCodes={
+     *         200="Returned create token",
+     *         403="Header:X-User-Agent-Authorizationの認証失敗"
+     *     }
+     * )
+     * @param Request $request
+     * @return array
+     */
+    public function postUsersLoginAction(Request $request)
+    {
+        $this->auth();
+        $user = $this->get("fos_user.user_manager")->findUserByUsernameOrEmail($request->get("user"));
+        if (!$user) {
+            return ["code" => 403, "message" => "not found user:"];
+        }
+        $factory = $this->get('security.encoder_factory');
+        $encoder = $factory->getEncoder($user);
+
+        $isValidPassword = ($encoder->isPasswordValid($user->getPassword(), $request->get("password"), $user->getSalt())) ? true : false;
+        if (!$isValidPassword) {
+            return ["code" => 403, "message" => "not found user"];
+        }
+
+        $keyApi = $this->getDoctrine()->getRepository("AppBundle:ApiKey")->findOneBy(["user" => $user]);
+        if(!$keyApi){
+            $key = \Ramsey\Uuid\Uuid::uuid1()->toString();
+            $keyApi = new ApiKey();
+            $keyApi->setUser($user);
+            $keyApi->setToken($key);
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($keyApi);
+            $manager->flush();
+        }
+//        return [$keyApi,$user];
+
+        return [
+            'user' => [
+                'id' => $user->getId(),
+                'username' => $user->getUsername()
+            ],
+            'api_key' => ["token" => $keyApi->getToken()],
+            'message' => "login success"
+        ];
+    }
+
 
 }
