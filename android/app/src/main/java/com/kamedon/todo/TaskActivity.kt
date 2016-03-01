@@ -59,7 +59,6 @@ class TaskActivity : RxAppCompatActivity() {
         val perf = ApiKeyService.createSharedPreferences(applicationContext)
         val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token, object : ApiClientBuilder.OnRequestListener {
             override fun onInvalidApiKeyOrNotFoundUser(response: Response) {
-                Log.d("response","res"+response.toString());
                 ApiKeyService.deleteApiKey(perf.edit());
                 startActivity(Intent(applicationContext, MainActivity::class.java));
                 finish();
