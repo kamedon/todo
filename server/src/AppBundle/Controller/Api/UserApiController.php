@@ -75,7 +75,7 @@ class UserApiController extends RestController
                     'id' => $user->getId(),
                     'username' => $user->getUsername()
                 ],
-                'api_key' => ["token" => $key],
+                'api_key' => ["token" => $apiKey->getToken()],
                 'message' => "created new user"
             ];
         }

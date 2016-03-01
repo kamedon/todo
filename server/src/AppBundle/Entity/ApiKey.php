@@ -71,7 +71,7 @@ class ApiKey
      */
     public function setToken($token)
     {
-        $this->token = hash_hmac('sha256', $token, false);
+        $this->token = $token;
         return $this;
     }
 
