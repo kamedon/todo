@@ -23,6 +23,7 @@ object ApiClientBuilder {
                             .header("Content-Type", "application/json")
                             .method(original.method(), original.body());
 
+                    Log.d("okhttp", XUserAgentAuthorizationUtil.token());
 
                     api_token?.let {
                         builder.header("Authorization", it)

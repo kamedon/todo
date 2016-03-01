@@ -56,7 +56,7 @@ class AuthRestService
         }
 
         $repository = $this->registryInterface->getRepository("AppBundle:ApiKey");
-        $apiKey = $repository->findOneBy(["token" => hash_hmac('sha256', $request->headers->get("Authorization"), false)]);
+        $apiKey = $repository->findOneBy(["token" => $request->headers->get("Authorization")]);
         if ($apiKey !== null) {
             return $apiKey->getUser();
         }
