@@ -31,13 +31,11 @@ class AuthApiController extends RestController
     public function postLoginAction(Request $request)
     {
         $this->auth();
-        $user = $this->get("fos_user.user_manager")->findUserByEmail($request->get("user"));
+        $user = $this->get("fos_user.user_manager")->findUserByUsernameOrEmail($request->get("user"));
         if (!$user) {
-            return ["code" => 403, "message" => "not found user"];
+            return ["code" => 403, "message" => "not found user:"];
         }
         $factory = $this->get('security.encoder_factory');
-
-
         $encoder = $factory->getEncoder($user);
 
         $isValidPassword = ($encoder->isPasswordValid($user->getPassword(), $request->get("password"), $user->getSalt())) ? true : false;
@@ -45,16 +43,17 @@ class AuthApiController extends RestController
             return ["code" => 403, "message" => "not found user"];
         }
 
-        $keyApi = $this->getDoctrine()->getRepository("AppBundle:ApiKey")->findBy(["user" => $user]);
+        $keyApi = $this->getDoctrine()->getRepository("AppBundle:ApiKey")->findOneBy(["user" => $user]);
         if(!$keyApi){
-            $token= Uuid::uuid1()->toString();
+            $key = \Ramsey\Uuid\Uuid::uuid1()->toString();
             $keyApi = new ApiKey();
             $keyApi->setUser($user);
-            $keyApi->setToken($token);
+            $keyApi->setToken($key);
             $manager = $this->getDoctrine()->getManager();
             $manager->persist($keyApi);
             $manager->flush();
         }
+//        return [$keyApi,$user];
 
         return [
             'user' => [
@@ -62,7 +61,7 @@ class AuthApiController extends RestController
                 'username' => $user->getUsername()
             ],
             'api_key' => ["token" => $keyApi->getToken()],
-            'message' => "created new user"
+            'message' => "login success"
         ];
     }
 
