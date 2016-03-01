@@ -11,9 +11,6 @@ security:
             id: fos_user.user_provider.username
 
     firewalls:
-        api:
-            pattern: ^/api
-            anonymous: true
         main:
             pattern: ^/
             form_login:
