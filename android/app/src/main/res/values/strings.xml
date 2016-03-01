@@ -21,6 +21,8 @@
     <string name="complete_register_task">Completed.</string>
     <string name="hello">Hello</string>
     <string name="complete_delete_task">Completed delete</string>
+    <string name="complete_login">Completed login</string>
+
 
 
 

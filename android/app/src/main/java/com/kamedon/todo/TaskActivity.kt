@@ -115,6 +115,7 @@ class TaskActivity : RxAppCompatActivity() {
         }
         when (intent?.extras?.getString("user", "") ?: "") {
             "new" -> Snackbar.make(layout_register_form, R.string.welcome, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            "login" -> Snackbar.make(layout_register_form, R.string.complete_login, Snackbar.LENGTH_LONG).setAction("Action", null).show()
             "" -> Snackbar.make(layout_register_form, R.string.hello, Snackbar.LENGTH_LONG).setAction("Action", null).show()
         }
 

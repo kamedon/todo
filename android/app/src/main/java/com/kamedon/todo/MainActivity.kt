@@ -41,9 +41,8 @@ class MainActivity : AppCompatActivity() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(object : Subscriber<NewUserResponse>() {
                         override fun onCompleted() {
-                            Log.d("api", "onCompleted");
                             val intent = Intent(applicationContext, TaskActivity::class.java)
-                            intent.putExtra("user", "new");
+                            intent.putExtra("user", "login");
                             startActivity(intent);
                             finish();
                         }
