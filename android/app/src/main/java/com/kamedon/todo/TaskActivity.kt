@@ -1,6 +1,8 @@
 package com.kamedon.todo
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.Toolbar
@@ -21,6 +23,7 @@ import com.kamedon.todo.service.ApiKeyService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.content_task.*
+import okhttp3.Response
 import rx.Observable
 import rx.Subscriber
 import rx.Subscription
@@ -54,7 +57,13 @@ class TaskActivity : RxAppCompatActivity() {
             taskFormAnimation.toggle();
         }
         val perf = ApiKeyService.createSharedPreferences(applicationContext)
-        val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token)
+        val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token, object : ApiClientBuilder.OnRequestListener {
+            override fun onInvalidApiKeyOrNotFoundUser(response: Response) {
+                ApiKeyService.deleteApiKey(perf.edit());
+                startActivity(Intent(applicationContext, MainActivity::class.java));
+                finish();
+            }
+        })
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         api = TodoApiBuilder.buildTaskApi(client)
         taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
@@ -175,9 +184,10 @@ class TaskActivity : RxAppCompatActivity() {
                     }
 
                     override fun onError(e: Throwable?) {
-                        Log.d("api", "ng:" + e?.message);
                         ptr_layout.setRefreshComplete()
                     }
                 }) ;
     }
 }
+
+

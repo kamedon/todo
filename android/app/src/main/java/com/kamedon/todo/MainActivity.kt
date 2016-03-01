@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         setContentView(R.layout.activity_main);
-        val client = ApiClientBuilder.createApi(null);
+        val client = ApiClientBuilder.createApi(null, null);
         val api = TodoApiBuilder.buildUserApi(client);
         btn_signIn.setOnClickListener {
             api.new(NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString()))
