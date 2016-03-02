@@ -21,7 +21,7 @@
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@mipmap/ic_launcher"
-                android:title="@string/logout" />
+                android:title="@string/action_logout" />
         </menu>
     </item>
 </menu>
