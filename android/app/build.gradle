@@ -14,10 +14,23 @@ android {
         versionName "1.0"
         buildConfigField("String", "X_USER_AGENT_AUTHORIZATION_TOKEN", "\"${X_USER_AGENT_AUTHORIZATION_TOKEN}\"")
     }
+    signingConfigs {
+        release {
+            def signFile = file("@release/keystore.txt")
+            def signingProps = new Properties()
+            signingProps.load(new FileInputStream(signFile))
+            storeFile file("@release/release_keystore.jks")
+            keyAlias signingProps['KEY_ALIAS']
+            storePassword signingProps['STORE_PASSWORD']
+            keyPassword signingProps['KEY_PASSWORD']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     sourceSets {

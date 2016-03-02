@@ -7,4 +7,7 @@
 /build
 /captures
 .idea/
+app/@release/keystore.txt
+app/@release/release_keystore.jks
+
 
