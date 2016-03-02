@@ -31,7 +31,6 @@
                 android:hint="@string/prompt_task"
                 android:imeActionId="@+id/btn_register"
                 android:imeOptions="actionUnspecified"
-                android:inputType="text"
                 android:maxLines="3"/>
 
         </android.support.design.widget.TextInputLayout>
