@@ -24,7 +24,7 @@ import com.kamedon.todo.entity.User
 import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
-import com.kamedon.todo.extension.execute
+import com.kamedon.todo.extension.observable
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
@@ -67,22 +67,21 @@ class TaskActivity : RxAppCompatActivity() {
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
         taskListAdapter.onComplete = { view, task, complete ->
-            api.delete(task.id)
-                    .execute(this@TaskActivity, object : Subscriber<DeleteTaskResponse>() {
-                        override fun onCompleted() {
-                            updateEmptyView();
-                            Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
-                        }
+            observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
+                override fun onCompleted() {
+                    updateEmptyView();
+                    Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                }
 
-                        override fun onNext(response: DeleteTaskResponse) {
-                            taskListAdapter.list.remove(task)
-                            taskListAdapter.notifyDataSetChanged()
-                        }
+                override fun onNext(response: DeleteTaskResponse) {
+                    taskListAdapter.list.remove(task)
+                    taskListAdapter.notifyDataSetChanged()
+                }
 
-                        override fun onError(e: Throwable?) {
-                            Log.d("api", "ng:" + e?.message);
-                        }
-                    }) ;
+                override fun onError(e: Throwable?) {
+                    Log.d("api", "ng:" + e?.message);
+                }
+            }) ;
 
         }
         list.adapter = taskListAdapter
@@ -90,24 +89,23 @@ class TaskActivity : RxAppCompatActivity() {
         btn_register.setOnClickListener {
             view ->
             inputMethodManager.hideSoftInputFromWindow(layout_register_form.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-            api.new(NewTaskQuery(edit_task.text.toString()))
-                    .execute(this@TaskActivity, object : Subscriber<NewTaskResponse>() {
-                        override fun onCompleted() {
-                            edit_task.setText("")
-                            taskListAdapter.notifyDataSetChanged()
-                            updateEmptyView();
-                            Snackbar.make(view, R.string.complete_register_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
-                        }
+            observable(api.new(NewTaskQuery(edit_task.text.toString())), object : Subscriber<NewTaskResponse>() {
+                override fun onCompleted() {
+                    edit_task.setText("")
+                    taskListAdapter.notifyDataSetChanged()
+                    updateEmptyView();
+                    Snackbar.make(view, R.string.complete_register_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                }
 
-                        override fun onNext(response: NewTaskResponse) {
-                            taskListAdapter.list.add(0, response.task)
-                        }
+                override fun onNext(response: NewTaskResponse) {
+                    taskListAdapter.list.add(0, response.task)
+                }
 
-                        override fun onError(e: Throwable?) {
+                override fun onError(e: Throwable?) {
 
-                            Log.d("api", "ng:" + e?.message);
-                        }
-                    }) ;
+                    Log.d("api", "ng:" + e?.message);
+                }
+            }) ;
         }
         when (intent?.extras?.getString("user", "") ?: "") {
             "new" -> Snackbar.make(layout_register_form, R.string.welcome, Snackbar.LENGTH_LONG).setAction("Action", null).show()
@@ -202,29 +200,28 @@ class TaskActivity : RxAppCompatActivity() {
     var subscription: Subscription? = null
 
     private fun updateList(page: Int, clean: Boolean) {
-        subscription = api.list(page)
-                .execute(this, object : Subscriber<List<Task>>() {
-                    override fun onCompleted() {
-                        taskListAdapter.notifyDataSetChanged()
-                        ptr_layout.setRefreshComplete()
-                        updateEmptyView();
-                    }
+        subscription = observable(api.list(page), object : Subscriber<List<Task>>() {
+            override fun onCompleted() {
+                taskListAdapter.notifyDataSetChanged()
+                ptr_layout.setRefreshComplete()
+                updateEmptyView();
+            }
 
 
-                    override fun onNext(response: List<Task>) {
-                        if (clean) {
-                            taskListAdapter.list = CopyOnWriteArrayList(response)
-                        } else {
-                            taskListAdapter.list.addAll(taskListAdapter.list.lastIndex, response)
-                        }
-                        taskListAdapter.notifyDataSetChanged()
-                        next = response.size >= 10;
-                    }
+            override fun onNext(response: List<Task>) {
+                if (clean) {
+                    taskListAdapter.list = CopyOnWriteArrayList(response)
+                } else {
+                    taskListAdapter.list.addAll(taskListAdapter.list.lastIndex, response)
+                }
+                taskListAdapter.notifyDataSetChanged()
+                next = response.size >= 10;
+            }
 
-                    override fun onError(e: Throwable?) {
-                        ptr_layout.setRefreshComplete()
-                    }
-                }) ;
+            override fun onError(e: Throwable?) {
+                ptr_layout.setRefreshComplete()
+            }
+        }) ;
     }
 
     private fun updateEmptyView() {
