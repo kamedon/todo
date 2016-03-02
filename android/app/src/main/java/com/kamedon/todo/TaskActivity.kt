@@ -111,7 +111,7 @@ class TaskActivity : RxAppCompatActivity() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(object : Subscriber<DeleteTaskResponse>() {
                         override fun onCompleted() {
-                            Snackbar.make(view, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                            Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
                         }
 
                         override fun onNext(response: DeleteTaskResponse) {
