@@ -20,10 +20,12 @@ import com.kamedon.todo.api.TodoApi
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.entity.Task
+import com.kamedon.todo.entity.User
 import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
 import com.kamedon.todo.service.ApiKeyService
+import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.content_task.*
@@ -44,6 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class TaskActivity : RxAppCompatActivity() {
     lateinit var taskFormAnimation: TaskFormAnimation
 
+    lateinit var user: User
     lateinit var api: TodoApi.TaskApi
     lateinit var inputMethodManager: InputMethodManager
     lateinit var taskListAdapter: TaskListAdapter
@@ -64,11 +67,15 @@ class TaskActivity : RxAppCompatActivity() {
             drawer.openDrawer(GravityCompat.START);
         }
 
+        user = UserService.getUser(perf);
         val navigationView = findViewById(R.id.nav_view) as NavigationView;
         val header = navigationView.getHeaderView(0);
-        val textName = header.findViewById(R.id.name) as TextView;
-        textName.text = "kamedon"
+        val textName = header.findViewById(R.id.text_name) as TextView;
+        textName.text = user.username
+        val textEmail = header.findViewById(R.id.text_email) as TextView;
+        textEmail.text = user.email
 
+        Log.d("user", user.toString());
 
         navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
