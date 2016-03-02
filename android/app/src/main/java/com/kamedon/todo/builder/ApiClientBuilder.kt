@@ -11,7 +11,7 @@ import okhttp3.Response
  * Created by kamedon on 2/29/16.
  */
 object ApiClientBuilder {
-    fun createApi(api_token: String?, listener: OnRequestListener?): OkHttpClient {
+    fun createApi(api_token: String? = null, listener: OnRequestListener? = null): OkHttpClient {
         return OkHttpClient.Builder()
                 .addInterceptor({
                     chain ->

@@ -31,7 +31,7 @@ class MainActivity : RxAppCompatActivity() {
             return
         }
         setContentView(R.layout.activity_main);
-        val client = ApiClientBuilder.createApi(null, null);
+        val client = ApiClientBuilder.createApi();
         val api = TodoApiBuilder.buildUserApi(client);
         btn_login.setOnClickListener {
             api.login(LoginUserApiData(edit_username.text.toString(), edit_password.text.toString()))
