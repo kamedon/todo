@@ -6,7 +6,7 @@
 .DS_Store
 /build
 /captures
-.idea/
+/.idea/
 app/@release/keystore.txt
 app/@release/release_keystore.jks
 
