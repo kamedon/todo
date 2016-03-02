@@ -1,8 +1,8 @@
 package com.kamedon.todo
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
@@ -24,19 +24,15 @@ import com.kamedon.todo.entity.User
 import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
-import com.kamedon.todo.service.ApiKeyService
+import com.kamedon.todo.extension.execute
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.content_task.*
 import okhttp3.Response
-import rx.Observable
 import rx.Subscriber
 import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
-import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -52,66 +48,29 @@ class TaskActivity : RxAppCompatActivity() {
     lateinit var taskListAdapter: TaskListAdapter
     var page: AtomicInteger = AtomicInteger(1);
     private var next: Boolean = true
+    lateinit var perf: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val perf = ApiKeyService.createSharedPreferences(applicationContext)
         setContentView(R.layout.activity_task)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        setSupportActionBar(toolbar)
-        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout;
-
-        toolbar.setNavigationIcon(R.drawable.abc_btn_switch_to_on_mtrl_00001)
-
-        toolbar.setNavigationOnClickListener {
-            drawer.openDrawer(GravityCompat.START);
-        }
-
+        perf = UserService.createSharedPreferences(applicationContext)
         user = UserService.getUser(perf);
-        val navigationView = findViewById(R.id.nav_view) as NavigationView;
-        val header = navigationView.getHeaderView(0);
-        val textName = header.findViewById(R.id.text_name) as TextView;
-        textName.text = user.username
-        val textEmail = header.findViewById(R.id.text_email) as TextView;
-        textEmail.text = user.email
 
-        Log.d("user", user.toString());
-
-        navigationView.setNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.nav_logout -> {
-                    ApiKeyService.deleteApiKey(perf.edit())
-                    startActivity(Intent(applicationContext, MainActivity::class.java))
-                    finish()
-                }
-
-            }
-            false
-        }
-
+        initToolBar();
+        initNavigation();
+        initApi();
         taskFormAnimation = TaskFormAnimation(layout_register_form)
         taskFormAnimation.topMargin = resources.getDimension(R.dimen.activity_vertical_margin)
         btn_toggle_task.setOnClickListener {
             taskFormAnimation.toggle();
         }
-        val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token, object : ApiClientBuilder.OnRequestListener {
-            override fun onInvalidApiKeyOrNotFoundUser(response: Response) {
-                ApiKeyService.deleteApiKey(perf.edit());
-                startActivity(Intent(applicationContext, MainActivity::class.java));
-                finish();
-            }
-        })
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
-        api = TodoApiBuilder.buildTaskApi(client)
         taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
         taskListAdapter.onComplete = { view, task, complete ->
             api.delete(task.id)
-                    .compose(bindToLifecycle<DeleteTaskResponse>())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(object : Subscriber<DeleteTaskResponse>() {
+                    .execute(this@TaskActivity, object : Subscriber<DeleteTaskResponse>() {
                         override fun onCompleted() {
-                            Snackbar.make(view, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                            Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
                         }
 
                         override fun onNext(response: DeleteTaskResponse) {
@@ -131,10 +90,7 @@ class TaskActivity : RxAppCompatActivity() {
             view ->
             inputMethodManager.hideSoftInputFromWindow(layout_register_form.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             api.new(NewTaskQuery(edit_task.text.toString()))
-                    .compose (bindToLifecycle<NewTaskResponse>())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(object : Subscriber<NewTaskResponse>() {
+                    .execute(this@TaskActivity, object : Subscriber<NewTaskResponse>() {
                         override fun onCompleted() {
                             edit_task.setText("")
                             Snackbar.make(view, R.string.complete_register_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
@@ -181,6 +137,53 @@ class TaskActivity : RxAppCompatActivity() {
         })
     }
 
+    private fun initApi() {
+        val client = ApiClientBuilder.createApi(UserService.getApiKey(perf).token, object : ApiClientBuilder.OnRequestListener {
+            override fun onInvalidApiKeyOrNotFoundUser(response: Response) {
+                UserService.deleteApiKey(perf.edit());
+                startActivity(Intent(applicationContext, MainActivity::class.java));
+                finish();
+            }
+        })
+        api = TodoApiBuilder.buildTaskApi(client)
+    }
+
+    private fun initNavigation() {
+        val navigationView = findViewById(R.id.nav_view) as NavigationView;
+        val header = navigationView.getHeaderView(0);
+        val textName = header.findViewById(R.id.text_name) as TextView;
+        textName.text = user.username
+        val textEmail = header.findViewById(R.id.text_email) as TextView;
+        textEmail.text = user.email
+
+        Log.d("user", user.toString());
+
+        navigationView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.nav_logout -> {
+                    UserService.deleteApiKey(perf.edit())
+                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                    finish()
+                }
+
+            }
+            false
+        }
+
+    }
+
+    private fun initToolBar() {
+        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        setSupportActionBar(toolbar)
+        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout;
+
+        toolbar.setNavigationIcon(R.drawable.abc_btn_switch_to_on_mtrl_00001)
+
+        toolbar.setNavigationOnClickListener {
+            drawer.openDrawer(GravityCompat.START);
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -198,10 +201,7 @@ class TaskActivity : RxAppCompatActivity() {
 
     private fun updateList(page: Int, clean: Boolean) {
         subscription = api.list(page)
-                .compose(bindToLifecycle<List<Task>>())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<List<Task>>() {
+                .execute(this, object : Subscriber<List<Task>>() {
                     override fun onCompleted() {
                         ptr_layout.setRefreshComplete()
                     }
@@ -228,5 +228,4 @@ class TaskActivity : RxAppCompatActivity() {
                 }) ;
     }
 }
-
 
