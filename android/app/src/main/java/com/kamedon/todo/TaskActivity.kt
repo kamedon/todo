@@ -138,6 +138,7 @@ class TaskActivity : RxAppCompatActivity() {
                         override fun onCompleted() {
                             edit_task.setText("")
                             Snackbar.make(view, R.string.complete_register_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                            taskListAdapter.notifyDataSetChanged()
                         }
 
                         override fun onNext(response: NewTaskResponse) {
