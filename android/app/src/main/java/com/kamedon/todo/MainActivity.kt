@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
+import com.kamedon.todo.dialog.SignUpDialog
 import com.kamedon.todo.entity.api.LoginUserApiData
 import com.kamedon.todo.entity.api.NewUserQuery
 import com.kamedon.todo.entity.api.NewUserResponse
@@ -55,27 +56,19 @@ class MainActivity : RxAppCompatActivity() {
         }
 
         btn_signIn.setOnClickListener {
-            api.new(NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString()))
-                    .execute(this@MainActivity, object : Subscriber<NewUserResponse>() {
-                        override fun onCompleted() {
-                            Log.d("api", "onCompleted");
-                            val intent = Intent(applicationContext, TaskActivity::class.java)
-                            intent.putExtra("user", "new");
-                            startActivity(intent);
-                            finish();
-                        }
+            SignUpDialog(api).show(this@MainActivity, object : SignUpDialog.OnSignUpListener {
+                override fun onComplete() {
+                    Log.d("api", "onCompleted");
+                    val intent = Intent(applicationContext, TaskActivity::class.java)
+                    intent.putExtra("user", "new");
+                    startActivity(intent);
+                    finish();
+                }
 
-                        override fun onNext(response: NewUserResponse) {
-                            Log.d("api", "response:${response.toString()}");
-                            UserService.update(perf.edit(), response)
-                        }
+                override fun onError(e: Throwable?) {
+                }
 
-                        override fun onError(e: Throwable?) {
-
-                            Log.d("api", "ng:" + e?.message);
-                        }
-                    }) ;
-
+            })
         }
     }
 }
