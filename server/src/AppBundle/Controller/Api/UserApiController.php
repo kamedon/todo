@@ -125,7 +125,8 @@ class UserApiController extends RestController
         return [
             'user' => [
                 'id' => $user->getId(),
-                'username' => $user->getUsername()
+                 'username' => $user->getUsername(),
+                 'email' => $user->getEmail()
             ],
             'api_key' => ["token" => $keyApi->getToken()],
             'message' => "login success"
