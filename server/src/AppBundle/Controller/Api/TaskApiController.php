@@ -81,7 +81,7 @@ class TaskApiController extends RestController
             ->setParameter('user', $user)
             ->orderBy('t.createdAt', 'DESC')
             ->setMaxResults(10)
-            ->setFirstResult(($page - 1) * 10 + 1)
+            ->setFirstResult(($page - 1) * 10  )
             ->getQuery();
         return $query->getResult();
     }
