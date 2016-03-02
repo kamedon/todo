@@ -50,8 +50,8 @@ class MainActivity : AppCompatActivity() {
 
                         override fun onNext(response: NewUserResponse) {
                             Log.d("api", "response:${response.toString()}");
-                            ApiKeyService.updateApiKey(perf.edit(), response.api_key)
-                            UserService.updateApiKey(perf.edit(), response.user)
+                            ApiKeyService.update(perf.edit(), response.api_key)
+                            UserService.update(perf.edit(), response.user)
                         }
 
                         override fun onError(e: Throwable?) {
@@ -75,7 +75,8 @@ class MainActivity : AppCompatActivity() {
 
                         override fun onNext(response: NewUserResponse) {
                             Log.d("api", "response:${response.toString()}");
-                            ApiKeyService.updateApiKey(perf.edit(), response.api_key)
+                            ApiKeyService.update(perf.edit(), response.api_key)
+                            UserService.update(perf.edit(), response.user)
                         }
 
                         override fun onError(e: Throwable?) {

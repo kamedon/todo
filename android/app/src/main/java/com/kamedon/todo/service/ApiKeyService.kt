@@ -13,7 +13,7 @@ object ApiKeyService {
     private val key_api_token: String = "key_api_token"
     fun createSharedPreferences(context: Context) = context.getSharedPreferences("todo_app", Context.MODE_PRIVATE)
 
-    fun updateApiKey(editor: SharedPreferences.Editor, apiKey: ApiKey) {
+    fun update(editor: SharedPreferences.Editor, apiKey: ApiKey) {
         editor.putString(key_api_token, Gson().toJson(apiKey))
         editor.apply();
     }

@@ -1,28 +1,21 @@
 package com.kamedon.todo.service
 
-import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.google.gson.Gson
-import com.kamedon.todo.entity.ApiKey
 import com.kamedon.todo.entity.User
-import com.kamedon.todo.entity.api.NewUserResponse
 
 /**
  * Created by h_kamei on 2016/03/02.
  */
 object UserService {
-    private val key_name: String = "key_name"
-    private val key_mail: String = "key_mail"
-    private val key_id: String = "key_id"
+    private val key_user: String = "key_user"
 
-    fun updateApiKey(editor: SharedPreferences.Editor, response: User) {
-        editor.putInt(key_id, response.id);
-        editor.putString(key_name, response.username);
-        editor.putString(key_mail, response.email);
+    fun update(editor: SharedPreferences.Editor, user: User) {
+        Log.d("update","data"+user.toString());
+        editor.putString(key_user, Gson().toJson(user))
         editor.apply();
     }
 
-    fun getUser(sharedPreferences: SharedPreferences): User {
-        return User(sharedPreferences.getInt(key_id, -1), sharedPreferences.getString(key_name, ""), sharedPreferences.getString(key_mail, ""))
-    }
+    fun getUser(sharedPreferences: SharedPreferences): User = Gson().fromJson(sharedPreferences.getString(key_user, "").toString(), User::class.java)
 }
