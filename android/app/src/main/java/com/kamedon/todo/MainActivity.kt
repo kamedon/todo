@@ -12,7 +12,9 @@ import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.service.ApiKeyService
 import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.entity.api.LoginUserApiData
+import com.kamedon.todo.extension.buildScheduler
 import com.kamedon.todo.service.UserService
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
@@ -21,7 +23,7 @@ import rx.schedulers.Schedulers
 /**
  * Created by kamedon on 2/29/16.
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : RxAppCompatActivity() {
 
     lateinit var perf: SharedPreferences
 
@@ -38,8 +40,7 @@ class MainActivity : AppCompatActivity() {
         val api = TodoApiBuilder.buildUserApi(client);
         btn_login.setOnClickListener {
             api.login(LoginUserApiData(edit_username.text.toString(), edit_password.text.toString()))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .buildScheduler(MainActivity@this)
                     .subscribe(object : Subscriber<NewUserResponse>() {
                         override fun onCompleted() {
                             val intent = Intent(applicationContext, TaskActivity::class.java)
@@ -62,8 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         btn_signIn.setOnClickListener {
             api.new(NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString()))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .buildScheduler(this@MainActivity)
                     .subscribe(object : Subscriber<NewUserResponse>() {
                         override fun onCompleted() {
                             Log.d("api", "onCompleted");

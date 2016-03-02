@@ -1,6 +1,5 @@
 package com.kamedon.todo
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,19 +23,18 @@ import com.kamedon.todo.entity.User
 import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
+import com.kamedon.todo.extension.buildScheduler
 import com.kamedon.todo.service.ApiKeyService
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.content_task.*
 import okhttp3.Response
-import rx.Observable
 import rx.Subscriber
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
-import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -131,9 +129,7 @@ class TaskActivity : RxAppCompatActivity() {
             view ->
             inputMethodManager.hideSoftInputFromWindow(layout_register_form.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             api.new(NewTaskQuery(edit_task.text.toString()))
-                    .compose (bindToLifecycle<NewTaskResponse>())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .buildScheduler(this@TaskActivity)
                     .subscribe(object : Subscriber<NewTaskResponse>() {
                         override fun onCompleted() {
                             edit_task.setText("")
@@ -198,9 +194,7 @@ class TaskActivity : RxAppCompatActivity() {
 
     private fun updateList(page: Int, clean: Boolean) {
         subscription = api.list(page)
-                .compose(bindToLifecycle<List<Task>>())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .buildScheduler(this)
                 .subscribe(object : Subscriber<List<Task>>() {
                     override fun onCompleted() {
                         ptr_layout.setRefreshComplete()
@@ -228,5 +222,4 @@ class TaskActivity : RxAppCompatActivity() {
                 }) ;
     }
 }
-
 
