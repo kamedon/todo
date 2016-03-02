@@ -12,6 +12,7 @@ import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.service.ApiKeyService
 import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.entity.api.LoginUserApiData
+import com.kamedon.todo.service.UserService
 import kotlinx.android.synthetic.main.activity_main.*
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
@@ -50,10 +51,10 @@ class MainActivity : AppCompatActivity() {
                         override fun onNext(response: NewUserResponse) {
                             Log.d("api", "response:${response.toString()}");
                             ApiKeyService.updateApiKey(perf.edit(), response.api_key)
+                            UserService.updateApiKey(perf.edit(), response.user)
                         }
 
                         override fun onError(e: Throwable?) {
-
                             Log.d("api", "ng:" + e?.message);
                         }
                     }) ;
