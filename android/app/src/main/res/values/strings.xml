@@ -3,10 +3,11 @@
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
-    <string name="prompt_username">Name</string>
+    <string name="prompt_username">name</string>
+    <string name="prompt_username_or_email">Name Or Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_login">Login</string>
-    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_up">Sign up</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is invalid</string>
     <string name="error_invalid_username">This username is invalid</string>
@@ -26,6 +27,7 @@
     <string name="task_untreated">untreated</string>
     <string name="task_all">all</string>
     <string name="logout">logout</string>
+    <string name="title_sign_up">Sign Up</string>
 
 
 </resources>
