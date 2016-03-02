@@ -24,7 +24,6 @@ import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
 import com.kamedon.todo.extension.execute
-import com.kamedon.todo.service.ApiKeyService
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
@@ -51,7 +50,7 @@ class TaskActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val perf = ApiKeyService.createSharedPreferences(applicationContext)
+        val perf = UserService.createSharedPreferences(applicationContext)
         setContentView(R.layout.activity_task)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
@@ -76,7 +75,7 @@ class TaskActivity : RxAppCompatActivity() {
         navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_logout -> {
-                    ApiKeyService.deleteApiKey(perf.edit())
+                    UserService.deleteApiKey(perf.edit())
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                     finish()
                 }
@@ -90,9 +89,9 @@ class TaskActivity : RxAppCompatActivity() {
         btn_toggle_task.setOnClickListener {
             taskFormAnimation.toggle();
         }
-        val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token, object : ApiClientBuilder.OnRequestListener {
+        val client = ApiClientBuilder.createApi(UserService.getApiKey(perf).token, object : ApiClientBuilder.OnRequestListener {
             override fun onInvalidApiKeyOrNotFoundUser(response: Response) {
-                ApiKeyService.deleteApiKey(perf.edit());
+                UserService.deleteApiKey(perf.edit());
                 startActivity(Intent(applicationContext, MainActivity::class.java));
                 finish();
             }
