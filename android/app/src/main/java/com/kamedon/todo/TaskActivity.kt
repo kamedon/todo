@@ -179,7 +179,7 @@ class TaskActivity : RxAppCompatActivity() {
         setSupportActionBar(toolbar)
         val drawer = findViewById(R.id.drawer_layout) as DrawerLayout;
 
-        toolbar.setNavigationIcon(R.drawable.abc_btn_switch_to_on_mtrl_00001)
+        toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp)
 
         toolbar.setNavigationOnClickListener {
             drawer.openDrawer(GravityCompat.START);

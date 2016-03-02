@@ -35,11 +35,12 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/action_register"/>
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_mode_edit_white_24dp"/>
     </LinearLayout>
 
     <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
