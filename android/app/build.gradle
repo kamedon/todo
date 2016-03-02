@@ -36,7 +36,9 @@ android {
     }
 
     buildTypes {
-        debug{
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix "-debug"
             shrinkResources true
             zipAlignEnabled true
         }
@@ -48,9 +50,13 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
+
 }
 
 dependencies {
