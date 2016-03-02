@@ -13,6 +13,7 @@ import com.kamedon.todo.service.ApiKeyService
 import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.entity.api.LoginUserApiData
 import com.kamedon.todo.extension.buildScheduler
+import com.kamedon.todo.extension.execute
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -40,8 +41,7 @@ class MainActivity : RxAppCompatActivity() {
         val api = TodoApiBuilder.buildUserApi(client);
         btn_login.setOnClickListener {
             api.login(LoginUserApiData(edit_username.text.toString(), edit_password.text.toString()))
-                    .buildScheduler(MainActivity@this)
-                    .subscribe(object : Subscriber<NewUserResponse>() {
+                    .execute(MainActivity@this, object : Subscriber<NewUserResponse>() {
                         override fun onCompleted() {
                             val intent = Intent(applicationContext, TaskActivity::class.java)
                             intent.putExtra("user", "login");
@@ -63,8 +63,7 @@ class MainActivity : RxAppCompatActivity() {
 
         btn_signIn.setOnClickListener {
             api.new(NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString()))
-                    .buildScheduler(this@MainActivity)
-                    .subscribe(object : Subscriber<NewUserResponse>() {
+                    .execute(this@MainActivity, object : Subscriber<NewUserResponse>() {
                         override fun onCompleted() {
                             Log.d("api", "onCompleted");
                             val intent = Intent(applicationContext, TaskActivity::class.java)

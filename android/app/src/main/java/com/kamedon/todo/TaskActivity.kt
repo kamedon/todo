@@ -23,7 +23,7 @@ import com.kamedon.todo.entity.User
 import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
-import com.kamedon.todo.extension.buildScheduler
+import com.kamedon.todo.extension.execute
 import com.kamedon.todo.service.ApiKeyService
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
@@ -32,8 +32,6 @@ import kotlinx.android.synthetic.main.content_task.*
 import okhttp3.Response
 import rx.Subscriber
 import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
@@ -104,10 +102,7 @@ class TaskActivity : RxAppCompatActivity() {
         taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
         taskListAdapter.onComplete = { view, task, complete ->
             api.delete(task.id)
-                    .compose(bindToLifecycle<DeleteTaskResponse>())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(object : Subscriber<DeleteTaskResponse>() {
+                    .execute(this@TaskActivity, object : Subscriber<DeleteTaskResponse>() {
                         override fun onCompleted() {
                             Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
                         }
@@ -129,8 +124,7 @@ class TaskActivity : RxAppCompatActivity() {
             view ->
             inputMethodManager.hideSoftInputFromWindow(layout_register_form.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             api.new(NewTaskQuery(edit_task.text.toString()))
-                    .buildScheduler(this@TaskActivity)
-                    .subscribe(object : Subscriber<NewTaskResponse>() {
+                    .execute(this@TaskActivity, object : Subscriber<NewTaskResponse>() {
                         override fun onCompleted() {
                             edit_task.setText("")
                             Snackbar.make(view, R.string.complete_register_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
@@ -194,8 +188,7 @@ class TaskActivity : RxAppCompatActivity() {
 
     private fun updateList(page: Int, clean: Boolean) {
         subscription = api.list(page)
-                .buildScheduler(this)
-                .subscribe(object : Subscriber<List<Task>>() {
+                .execute(this, object : Subscriber<List<Task>>() {
                     override fun onCompleted() {
                         ptr_layout.setRefreshComplete()
                     }
