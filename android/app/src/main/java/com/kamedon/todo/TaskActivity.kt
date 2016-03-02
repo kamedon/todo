@@ -4,12 +4,16 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
+import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.AbsListView
+import android.widget.TextView
 import com.kamedon.todo.adapter.TaskListAdapter
 import com.kamedon.todo.anim.TaskFormAnimation
 import com.kamedon.todo.api.TodoApi
@@ -48,15 +52,41 @@ class TaskActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val perf = ApiKeyService.createSharedPreferences(applicationContext)
         setContentView(R.layout.activity_task)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
+        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout;
+
+        toolbar.setNavigationIcon(R.drawable.abc_btn_switch_to_on_mtrl_00001)
+
+        toolbar.setNavigationOnClickListener {
+            drawer.openDrawer(GravityCompat.START);
+        }
+
+        val navigationView = findViewById(R.id.nav_view) as NavigationView;
+        val header = navigationView.getHeaderView(0);
+        val textName = header.findViewById(R.id.name) as TextView;
+        textName.text = "kamedon"
+
+
+        navigationView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.nav_logout -> {
+                    ApiKeyService.deleteApiKey(perf.edit())
+                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                    finish()
+                }
+
+            }
+            false
+        }
+
         taskFormAnimation = TaskFormAnimation(layout_register_form)
         taskFormAnimation.topMargin = resources.getDimension(R.dimen.activity_vertical_margin)
         btn_toggle_task.setOnClickListener {
             taskFormAnimation.toggle();
         }
-        val perf = ApiKeyService.createSharedPreferences(applicationContext)
         val client = ApiClientBuilder.createApi(ApiKeyService.getApiKey(perf).token, object : ApiClientBuilder.OnRequestListener {
             override fun onInvalidApiKeyOrNotFoundUser(response: Response) {
                 ApiKeyService.deleteApiKey(perf.edit());

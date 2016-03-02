@@ -22,9 +22,10 @@
     <string name="hello">Hello</string>
     <string name="complete_delete_task">Completed delete</string>
     <string name="complete_login">Completed login</string>
-
-
-
+    <string name="task_complete">complete</string>
+    <string name="task_untreated">untreated</string>
+    <string name="task_all">all</string>
+    <string name="logout">logout</string>
 
 
 </resources>
