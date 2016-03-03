@@ -116,7 +116,7 @@ class TaskApiController extends RestController
             ->select(["t.id", "t.body", "t.state", "t.createdAt", "t.updatedAt"])
             ->where('t.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('t.updatedAt', 'DESC')
+            ->orderBy('t.createdAt', 'DESC')
             ->setMaxResults(10)
             ->setFirstResult(($page - 1) * 10);
 
