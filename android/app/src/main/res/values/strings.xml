@@ -41,6 +41,10 @@
     <string name="error_not_found_user">Not Found User</string>
     <string name="prompt_password_confirm">Confirm password</string>
     <string name="error_confirm_password">Not equal password</string>
+    <string name="title_task_all">Todo All Task</string>
+    <string name="title_task_untreated">Todo Untreated Task</string>
+    <string name="title_task_complete">Todo Complete Task</string>
+
 
 
 </resources>

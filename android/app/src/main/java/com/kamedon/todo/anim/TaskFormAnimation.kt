@@ -30,7 +30,7 @@ class TaskFormAnimation(val view: View) {
 
             override fun onAnimationEnd(p0: Animator?) {
                 isShow = false;
-                view.visibility = View.INVISIBLE
+                view.visibility = View.GONE
             }
 
             override fun onAnimationCancel(p0: Animator?) {

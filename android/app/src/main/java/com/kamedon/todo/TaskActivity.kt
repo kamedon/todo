@@ -35,6 +35,7 @@ import rx.Subscriber
 import rx.Subscription
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -50,7 +51,7 @@ class TaskActivity : RxAppCompatActivity() {
     lateinit var perf: SharedPreferences
 
     var subscription: Subscription? = null
-    private var next: Boolean = true
+    private var next: AtomicBoolean = AtomicBoolean(true)
 
     private var page: AtomicInteger = AtomicInteger(1);
     private var state: String = Task.state_all;
@@ -112,8 +113,8 @@ class TaskActivity : RxAppCompatActivity() {
                 override fun onComplete() {
                     val view = list.getChildAt(position);
                     taskListAdapter.getView(position, view, list);
-                    //                    taskListAdapter.notifyDataSetChanged()
-                    //                    list.invalidateViews();
+                    //taskListAdapter.notifyDataSetChanged()
+                    //list.invalidateViews();
                     Snackbar.make(layout_register_form, R.string.complete_edit_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
                 }
             }).show(this@TaskActivity, task)
@@ -171,7 +172,7 @@ class TaskActivity : RxAppCompatActivity() {
             override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
                 val process = subscription?.isUnsubscribed ?: false
                 val isLastItemVisible = totalItemCount == list.firstVisiblePosition + visibleItemCount;
-                if (isLastItemVisible && process && next) {
+                if (isLastItemVisible && process && next.get()) {
                     updateList(state, page.incrementAndGet(), false)
                 }
             }
@@ -205,9 +206,9 @@ class TaskActivity : RxAppCompatActivity() {
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                     finish()
                 }
-                R.id.nav_all -> update(Task.state_all)
-                R.id.nav_untreated -> update(Task.state_untreated)
-                R.id.nav_complete -> update(Task.state_complete)
+                R.id.nav_all -> update(Task.state_all, R.string.title_task_all)
+                R.id.nav_untreated -> update(Task.state_untreated, R.string.title_task_untreated)
+                R.id.nav_complete -> update(Task.state_complete, R.string.title_task_complete)
             }
             false
         }
@@ -241,11 +242,16 @@ class TaskActivity : RxAppCompatActivity() {
     }
 
 
-    private fun update(state: String) {
-        this.state = state;
-        drawer_layout.closeDrawers()
+    private fun update(state: String, stringId: Int) {
+        next.set(true)
+        updateHeader(state, stringId)
         updateList(state, 1, true)
+    }
 
+    private fun updateHeader(state: String, stringId: Int) {
+        this.state = state;
+        toolbar.title = getString(stringId)
+        drawer_layout.closeDrawers()
     }
 
     private fun updateList(state: String, page: Int, clean: Boolean) {
@@ -254,7 +260,7 @@ class TaskActivity : RxAppCompatActivity() {
                 taskListAdapter.notifyDataSetChanged()
                 ptr_layout.setRefreshComplete()
                 updateEmptyView();
-                if(clean){
+                if (clean) {
                     updateForm()
                 }
             }
@@ -267,7 +273,7 @@ class TaskActivity : RxAppCompatActivity() {
                     taskListAdapter.list.addAll(taskListAdapter.list.lastIndex, response)
                 }
                 taskListAdapter.notifyDataSetChanged()
-                next = response.size >= 10;
+                next.set(response.size >= BuildConfig.PAGE_LIMIT);
             }
 
             override fun onError(e: Throwable?) {
@@ -275,6 +281,7 @@ class TaskActivity : RxAppCompatActivity() {
             }
         }) ;
     }
+
     private fun updateForm() {
         if (taskListAdapter.isEmpty) {
             taskFormAnimation.show()

@@ -13,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField("String", "X_USER_AGENT_AUTHORIZATION_TOKEN", "\"${X_USER_AGENT_AUTHORIZATION_TOKEN}\"")
+        buildConfigField("int", "PAGE_LIMIT", "20")
     }
 
     packagingOptions {
