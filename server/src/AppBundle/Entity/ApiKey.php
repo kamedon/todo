@@ -23,8 +23,8 @@ class ApiKey
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="User", mappedBy="apiKey", cascade={"persist"})
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     * @ORM\OneToOne(targetEntity="User", mappedBy="apiKey", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     private $user;
 
