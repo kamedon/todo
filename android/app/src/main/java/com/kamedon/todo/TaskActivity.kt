@@ -141,7 +141,8 @@ class TaskActivity : RxAppCompatActivity() {
         val client = ApiClientBuilder.createApi(UserService.getApiKey(perf).token, object : ApiClientBuilder.OnRequestListener {
             override fun onInvalidApiKeyOrNotFoundUser(response: Response) {
                 UserService.deleteApiKey(perf.edit());
-                startActivity(Intent(applicationContext, MainActivity::class.java));
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                startActivity(intent);
                 finish();
             }
         })

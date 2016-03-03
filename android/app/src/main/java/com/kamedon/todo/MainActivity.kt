@@ -9,6 +9,7 @@ import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.dialog.SignUpDialog
 import com.kamedon.todo.entity.api.LoginUserApiData
 import com.kamedon.todo.entity.api.NewUserResponse
+import com.kamedon.todo.extension.buildIntent
 import com.kamedon.todo.extension.observable
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
@@ -36,7 +37,7 @@ class MainActivity : RxAppCompatActivity() {
         btn_login.setOnClickListener {
             observable(api.login(LoginUserApiData(edit_username.text.toString(), edit_password.text.toString())), object : Subscriber<NewUserResponse>() {
                 override fun onCompleted() {
-                    val intent = Intent(applicationContext, TaskActivity::class.java)
+                    val intent = buildIntent(TaskActivity::class.java)
                     intent.putExtra("user", "login");
                     startActivity(intent);
                     finish();
@@ -57,7 +58,7 @@ class MainActivity : RxAppCompatActivity() {
             SignUpDialog(api).show(this@MainActivity, object : SignUpDialog.OnSignUpListener {
                 override fun onComplete() {
                     Log.d("api", "onCompleted");
-                    val intent = Intent(applicationContext, TaskActivity::class.java)
+                    val intent = buildIntent(TaskActivity::class.java)
                     intent.putExtra("user", "new");
                     startActivity(intent);
                     finish();
