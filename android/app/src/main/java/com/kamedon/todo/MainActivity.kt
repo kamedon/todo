@@ -3,6 +3,7 @@ package com.kamedon.todo
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.util.Log
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
@@ -14,6 +15,7 @@ import com.kamedon.todo.extension.observable
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_task.*
 import rx.Subscriber
 
 /**
@@ -37,15 +39,22 @@ class MainActivity : RxAppCompatActivity() {
         btn_login.setOnClickListener {
             observable(api.login(LoginUserApiData(edit_username.text.toString(), edit_password.text.toString())), object : Subscriber<NewUserResponse>() {
                 override fun onCompleted() {
-                    val intent = buildIntent(TaskActivity::class.java)
-                    intent.putExtra("user", "login");
-                    startActivity(intent);
-                    finish();
+                    if (UserService.isLogin(perf)) {
+                        val intent = buildIntent(TaskActivity::class.java)
+                        intent.putExtra("user", "login");
+                        startActivity(intent);
+                        finish()
+                    }
+
                 }
 
                 override fun onNext(response: NewUserResponse) {
                     Log.d("api", "response:${response.toString()}");
-                    UserService.update(perf.edit(), response)
+                    when (response.code) {
+                        403 -> Snackbar.make(login_form, R.string.error_not_found_user, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                        200 -> UserService.update(perf.edit(), response)
+                    }
+                    //
                 }
 
                 override fun onError(e: Throwable?) {
