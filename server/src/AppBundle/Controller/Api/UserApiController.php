@@ -54,13 +54,12 @@ class UserApiController extends RestController
             $user->setUsername($u->getUsername());
 
             if ($userManager->findUserByUsername($user->getUsername()) || $userManager->findUserByEmail($user->getEmail())) {
-                throw new HttpException(400, "not unique user");
+                return ["code" => 400, "errors" => ["other" => ["errors" => "It has already been registered"]], "message" => "It has already been registered"];
             }
 
             try {
                 $userManager->updateUser($user);
             } catch (Exception $e) {
-                throw new HttpException(400, "New User is not valid.");
             }
             $key = \Ramsey\Uuid\Uuid::uuid1()->toString();
             $apiKey = new ApiKey();
@@ -71,6 +70,7 @@ class UserApiController extends RestController
             $em->flush();
 
             return [
+                'code' => 201,
                 'user' => [
                     'id' => $user->getId(),
                     'username' => $user->getUsername(),
@@ -80,8 +80,18 @@ class UserApiController extends RestController
                 'message' => "created new user"
             ];
         }
-        throw new HttpException(400, "New User is not valid.");
+        $errors = $form->getErrors(true, false);
 
+        $errorMessage = [];
+        foreach (["email", "username", "plainPassword"] as $key) {
+            $e = $errors->getForm()[$key]->getErrors();
+            if ($e->count() > 0) {
+                $errorMessage[$key] = $e->getForm();
+            } else {
+                $errorMessage[$key]["errors"] = [];
+            }
+        }
+        return ["code" => 400, "errors" => $errorMessage, "message" => "invalid query"];
     }
 
     /**
@@ -100,18 +110,18 @@ class UserApiController extends RestController
         $this->auth();
         $user = $this->get("fos_user.user_manager")->findUserByUsernameOrEmail($request->get("user"));
         if (!$user) {
-            return ["code" => 403, "message" => "not found user:"];
+            return ["code" => 400, "errors" => ["other" => ["errors" => "It has already been registered"]], "message" => "not found user"];
         }
         $factory = $this->get('security.encoder_factory');
         $encoder = $factory->getEncoder($user);
 
         $isValidPassword = ($encoder->isPasswordValid($user->getPassword(), $request->get("password"), $user->getSalt())) ? true : false;
         if (!$isValidPassword) {
-            return ["code" => 403, "message" => "not found user"];
+            return ["code" => 400, "errors" => ["other" => ["errors" => "It has already been registered"]], "message" => "not found user"];
         }
 
         $keyApi = $this->getDoctrine()->getRepository("AppBundle:ApiKey")->findOneBy(["user" => $user]);
-        if(!$keyApi){
+        if (!$keyApi) {
             $key = \Ramsey\Uuid\Uuid::uuid1()->toString();
             $keyApi = new ApiKey();
             $keyApi->setUser($user);
@@ -120,13 +130,12 @@ class UserApiController extends RestController
             $manager->persist($keyApi);
             $manager->flush();
         }
-//        return [$keyApi,$user];
-
         return [
+            'code' => 200,
             'user' => [
                 'id' => $user->getId(),
-                 'username' => $user->getUsername(),
-                 'email' => $user->getEmail()
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail()
             ],
             'api_key' => ["token" => $keyApi->getToken()],
             'message' => "login success"

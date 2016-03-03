@@ -14,27 +14,35 @@ class NewUserRequest
 {
 
     /**
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(
+     *    message = "email should not be blank."
+     * )
      * @Assert\Email()
      */
     protected $email;
 
     /**
+     * @Assert\NotBlank(
+     *    message = "password should not be blank."
+     * )
      * @Assert\Length(
      *      min = 6,
      *      max = 16,
-     *      minMessage = "Your first name must be at least {{ limit }} characters long",
-     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     *      minMessage = "name must be at least {{ limit }} characters long",
+     *      maxMessage = "name cannot be longer than {{ limit }} characters"
      * )
      */
     protected $plainPassword;
 
     /**
+     * @Assert\NotBlank(
+     *    message = "password should not be blank."
+     * )
      * @Assert\Length(
-     *      min = 4,
+     *      min = 3,
      *      max = 16,
-     *      minMessage = "Your first name must be at least {{ limit }} characters long",
-     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     *      minMessage = "name must be at least {{ limit }} characters long",
+     *      maxMessage = "name cannot be longer than {{ limit }} characters"
      * )
      */
     protected $username;

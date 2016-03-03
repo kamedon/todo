@@ -34,11 +34,12 @@ object UserService {
         editor.apply();
     }
 
-    fun hasApiKey(sharedPreferences: SharedPreferences): Boolean = !sharedPreferences.getString(key_api_token, "").equals("")
-    fun getApiKey(sharedPreferences: SharedPreferences): ApiKey = Gson().fromJson(sharedPreferences.getString(key_api_token, "").toString(), ApiKey::class.java)
+    fun hasApiKey(sharedPreferences: SharedPreferences) = !sharedPreferences.getString(key_api_token, "").equals("")
+    fun getApiKey(sharedPreferences: SharedPreferences) = Gson().fromJson(sharedPreferences.getString(key_api_token, "").toString(), ApiKey::class.java)
     fun deleteApiKey(editor: SharedPreferences.Editor) = editor.remove(key_api_token).apply()
 
 
-    fun getUser(sharedPreferences: SharedPreferences): User = Gson().fromJson(sharedPreferences.getString(key_user, "").toString(), User::class.java)
+    fun getUser(sharedPreferences: SharedPreferences) = Gson().fromJson(sharedPreferences.getString(key_user, "").toString(), User::class.java)
 
+    fun isLogin(sharedPreferences: SharedPreferences) = hasApiKey(sharedPreferences)
 }
