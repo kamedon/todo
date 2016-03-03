@@ -71,14 +71,23 @@ class TaskActivity : RxAppCompatActivity() {
             taskFormAnimation.toggle();
         }
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
+
+        /*
+         * Task一覧の初期化
+         */
         taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
         taskListAdapter.onComplete = { view, task, complete ->
             observable(api.edit(task.id, task.body, task.state), object : Subscriber<NewTaskResponse>() {
                 override fun onNext(response: NewTaskResponse) {
                     Log.d("response", response.toString());
+                    if (!state.equals(response.task.state) && !state.equals(Task.state_all) ) {
+                        taskListAdapter.list.remove(task)
+                    }
+                    Snackbar.make(layout_register_form, response.task.state(resources), Snackbar.LENGTH_LONG).show();
                 }
 
                 override fun onCompleted() {
+                    taskListAdapter.notifyDataSetChanged()
                 }
 
                 override fun onError(e: Throwable?) {
