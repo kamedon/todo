@@ -106,22 +106,25 @@ class TaskApiController extends RestController
      */
     public function getTasksStateAction($state, Request $request)
     {
-        if (!in_array($state, Task::$STATE)) {
+        if (!(in_array($state, Task::$STATE) || $state === "all")) {
             return [];
         }
         $page = $request->get("page", 1);
         $user = $this->authUser();
         $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
-        $query = $repository->createQueryBuilder('t')
+        $builder = $repository->createQueryBuilder('t')
             ->select(["t.id", "t.body", "t.state", "t.createdAt", "t.updatedAt"])
             ->where('t.user = :user')
-            ->andWhere('t.state = :state')
             ->setParameter('user', $user)
-            ->setParameter('state', $state)
             ->orderBy('t.updatedAt', 'DESC')
             ->setMaxResults(10)
-            ->setFirstResult(($page - 1) * 10)
-            ->getQuery();
+            ->setFirstResult(($page - 1) * 10);
+
+        if ($state !== "all") {
+            $builder->andWhere('t.state = :state')
+                ->setParameter('state', $state);
+        }
+        $query = $builder->getQuery();
         return $query->getResult();
     }
 
