@@ -8,9 +8,9 @@
 
 namespace AppBundle\Controller\Api;
 
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 
-
+use FOS\RestBundle\Controller\Annotations\Route;
+use FOS\RestBundle\Controller\Annotations\Get;
 use AppBundle\Entity\Task;
 use AppBundle\Form\TaskFormType;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -70,7 +70,6 @@ class TaskApiController extends RestController
      *     }
      * )
      *
-     * @QueryParam(name="page", nullable=true, requirements="\d+")
      * @param Request $request
      * @return array
      */
@@ -92,6 +91,43 @@ class TaskApiController extends RestController
 
     /**
      *
+     * @Get("tasks/{state}")
+     * @ApiDoc(
+     *     description="タスク一覧",
+     *     statusCodes={
+     *         200="list task",
+     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
+     *     }
+     * )
+     *
+     * @param string $state
+     * @param Request $request
+     * @return array
+     */
+    public function getTasksStateAction($state, Request $request)
+    {
+        if (!in_array($state, Task::$STATE)) {
+            return [];
+        }
+        $page = $request->get("page", 1);
+        $user = $this->authUser();
+        $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
+        $query = $repository->createQueryBuilder('t')
+            ->select(["t.id", "t.body", "t.state", "t.createdAt", "t.updatedAt"])
+            ->where('t.user = :user')
+            ->andWhere('t.state = :state')
+            ->setParameter('user', $user)
+            ->setParameter('state', $state)
+            ->orderBy('t.updatedAt', 'DESC')
+            ->setMaxResults(10)
+            ->setFirstResult(($page - 1) * 10)
+            ->getQuery();
+        return $query->getResult();
+    }
+
+    /**
+     *
+     * @Route(requirements={"id"="\d+"})
      * @ApiDoc(
      *     description="タスク削除",
      *     statusCodes={
@@ -120,6 +156,7 @@ class TaskApiController extends RestController
 
     /**
      *
+     * @Route(requirements={"id"="\d+"})
      * @ApiDoc(
      *     description="タスク変数",
      *     statusCodes={

@@ -14,6 +14,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Task
 {
+    public static $STATE= ["untreated", "process", "complete"];
+
     /**
      * @var int
      *
