@@ -31,6 +31,8 @@
     <string name="nothing_task">Nothing</string>
     <string name="error_not_found_user">Not Found User</string>
     <string name="prompt_password_confirm">Confirm password</string>
+    <string name="error_confirm_password">Not equal password</string>
+
 
 
 </resources>
