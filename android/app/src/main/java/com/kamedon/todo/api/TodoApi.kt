@@ -16,8 +16,8 @@ object TodoApi {
         @POST("/api/tasks.json")
         fun new(@Body user: NewTaskQuery): Observable<NewTaskResponse>
 
-        @GET("/api/tasks/{page}.json")
-        fun list(@Path("page") page: Int = 1): Observable<List<Task>>
+        @GET("/api/tasks.json")
+        fun list(@Query ("page") page: Int = 1): Observable<List<Task>>
 
         @DELETE("/api/tasks/{id}.json")
         fun delete(@Path("id") id: Int): Observable<DeleteTaskResponse>
