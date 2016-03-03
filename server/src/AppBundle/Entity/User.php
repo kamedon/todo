@@ -29,11 +29,23 @@ class User extends BaseUser
      */
     protected $apiKey;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="user")
+     */
+    protected $tasks;
 
     public function __construct()
     {
         parent::__construct();
-        // your own logic
+    }
+
+    /**
+     * @param Task $task
+     * @return bool
+     */
+    public function own(Task $task)
+    {
+        return $task->getUser()->getId() === $this->getId();
     }
 
     /**
@@ -59,4 +71,39 @@ class User extends BaseUser
     {
         return $this->apiKey;
     }
+
+    /**
+     * Add task
+     *
+     * @param \AppBundle\Entity\Task $task
+     *
+     * @return User
+     */
+    public function addTask(\AppBundle\Entity\Task $task)
+    {
+        $this->tasks[] = $task;
+
+        return $this;
+    }
+
+    /**
+     * Remove task
+     *
+     * @param \AppBundle\Entity\Task $task
+     */
+    public function removeTask(\AppBundle\Entity\Task $task)
+    {
+        $this->tasks->removeElement($task);
+    }
+
+    /**
+     * Get tasks
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTasks()
+    {
+        return $this->tasks;
+    }
+
 }

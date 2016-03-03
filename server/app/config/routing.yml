@@ -1,16 +1,16 @@
-app:
-    resource: "@AppBundle/Controller/"
-    type:     annotation
-
-fos_user:
-    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
-
-rest_auth:
-    resource: "@AppBundle/Controller/Api/AuthApiController.php"
-    type:     rest
-    prefix:   /api
+#app:
+#    resource: "@AppBundle/Controller/"
+#    type:     annotation
+#
+#fos_user:
+#    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
 
 rest_user:
     resource: "@AppBundle/Controller/Api/UserApiController.php"
+    type:     rest
+    prefix:   /api
+
+rest_task:
+    resource: "@AppBundle/Controller/Api/TaskApiController.php"
     type:     rest
     prefix:   /api

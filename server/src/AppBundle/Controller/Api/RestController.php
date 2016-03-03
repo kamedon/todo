@@ -19,4 +19,10 @@ class RestController extends FOSRestController
         $authService->auth();
     }
 
+    protected function authUser()
+    {
+        $authService = $this->get("auth_rest_service");
+        return $authService->authUser();
+    }
+
 }

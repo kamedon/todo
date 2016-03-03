@@ -4,7 +4,6 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Ramsey\Uuid\Uuid;
 
 /**
  * ApiKey
@@ -24,8 +23,8 @@ class ApiKey
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="User", mappedBy="apiKey", cascade={"persist"})
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     * @ORM\OneToOne(targetEntity="User", mappedBy="apiKey", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     private $user;
 
@@ -73,7 +72,6 @@ class ApiKey
     public function setToken($token)
     {
         $this->token = $token;
-
         return $this;
     }
 
