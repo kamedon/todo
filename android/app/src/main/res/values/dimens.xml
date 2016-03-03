@@ -5,4 +5,5 @@
     <dimen name="list_horizontal_margin">5dp</dimen>
     <dimen name="list_vertical_margin">5dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="toolbar_vertical_margin">40dp</dimen>
 </resources>
