@@ -22,48 +22,56 @@ class TaskFormAnimation(val view: View) {
         }
     }
 
-    fun toggle() {
-        if (isShow) {
-            Log.d("anime", "hide");
-            val y = -layoutFormBottom + topMargin;
-            view.animate().translationY(y).setListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
-                }
-
-                override fun onAnimationEnd(p0: Animator?) {
-                    isShow = false;
-                    view.visibility = View.GONE
-                }
-
-                override fun onAnimationCancel(p0: Animator?) {
-                }
-
-                override fun onAnimationStart(p0: Animator?) {
-                }
-
+    fun hide() {
+        val y = -layoutFormBottom + topMargin;
+        view.animate().translationY(y).setListener(object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(p0: Animator?) {
             }
 
-            ).start()
+            override fun onAnimationEnd(p0: Animator?) {
+                isShow = false;
+                view.visibility = View.INVISIBLE
+            }
+
+            override fun onAnimationCancel(p0: Animator?) {
+            }
+
+            override fun onAnimationStart(p0: Animator?) {
+            }
+
+        }
+
+        ).start()
+
+    }
+
+    fun show() {
+
+        val y = layoutFormTop - topMargin;
+        //                layout_register_form.y = -layoutFormBottom + topMargin;
+        view.visibility = View.VISIBLE
+        view.animate().translationY(y).setListener(object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(p0: Animator?) {
+            }
+
+            override fun onAnimationEnd(p0: Animator?) {
+                isShow = true;
+            }
+
+            override fun onAnimationCancel(p0: Animator?) {
+            }
+
+            override fun onAnimationStart(p0: Animator?) {
+            }
+
+        }).start()
+    }
+
+    fun toggle() {
+        if (isShow) {
+            hide()
         } else {
-            Log.d("anime", "hide");
-            val y = layoutFormTop - topMargin;
-            //                layout_register_form.y = -layoutFormBottom + topMargin;
-            view.visibility = View.VISIBLE
-            view.animate().translationY(y).setListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
-                }
-
-                override fun onAnimationEnd(p0: Animator?) {
-                    isShow = true;
-                }
-
-                override fun onAnimationCancel(p0: Animator?) {
-                }
-
-                override fun onAnimationStart(p0: Animator?) {
-                }
-
-            }).start()
+            show()
         }
     }
 }

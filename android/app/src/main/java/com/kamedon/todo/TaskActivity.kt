@@ -13,15 +13,16 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.AbsListView
+import android.widget.AdapterView
 import android.widget.TextView
 import com.kamedon.todo.adapter.TaskListAdapter
 import com.kamedon.todo.anim.TaskFormAnimation
 import com.kamedon.todo.api.TodoApi
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
+import com.kamedon.todo.dialog.EditTaskDialog
 import com.kamedon.todo.entity.Task
 import com.kamedon.todo.entity.User
-import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
 import com.kamedon.todo.extension.observable
@@ -83,23 +84,39 @@ class TaskActivity : RxAppCompatActivity() {
                     Log.d("response", e.toString());
                 }
             })
+        }
+        taskListAdapter.onItemLongClickListener = { position, task ->
+            EditTaskDialog(api)
+                    .setInputMethodManager(inputMethodManager)
+                    .setOnDeleteListener(object : EditTaskDialog.OnDeleteListener {
+                        override fun onDelete(task: Task) {
+                            taskListAdapter.list.remove(task)
+                        }
 
-            //            observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
-            //                override fun onCompleted() {
-            //                    updateEmptyView();
-            //                    Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
-            //                }
-            //
-            //                override fun onNext(response: DeleteTaskResponse) {
-            //                    taskListAdapter.list.remove(task)
-            //                    taskListAdapter.notifyDataSetChanged()
-            //                }
-            //
-            //                override fun onError(e: Throwable?) {
-            //                    Log.d("api", "ng:" + e?.message);
-            //                }
-            //            }) ;
+                        override fun onError(e: Throwable?) {
+                        }
 
+                        override fun onComplete() {
+                            updateEmptyView();
+                            taskListAdapter.notifyDataSetChanged()
+                            Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                        }
+
+                    }).setOnEditListener(object : EditTaskDialog.OnEditListener {
+                override fun onEdit(task: Task) {
+                }
+
+                override fun onError(e: Throwable?) {
+                }
+
+                override fun onComplete() {
+                    val view = list.getChildAt(position);
+                    taskListAdapter.getView(position, view, list);
+                    //                    taskListAdapter.notifyDataSetChanged()
+                    //                    list.invalidateViews();
+                    Snackbar.make(layout_register_form, R.string.complete_edit_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                }
+            }).show(this@TaskActivity, task)
         }
         list.adapter = taskListAdapter
 
@@ -109,7 +126,6 @@ class TaskActivity : RxAppCompatActivity() {
             val query = NewTaskQuery(edit_task.text.toString())
             val errors = query.valid(resources)
             if (errors.isEmpty()) {
-
                 observable(api.new(query), object : Subscriber<NewTaskResponse>() {
                     override fun onCompleted() {
                         edit_task.setText("")
@@ -119,8 +135,6 @@ class TaskActivity : RxAppCompatActivity() {
                     }
 
                     override fun onNext(response: NewTaskResponse) {
-
-
                         taskListAdapter.list.add(0, response.task)
                     }
 
@@ -216,6 +230,7 @@ class TaskActivity : RxAppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        ptr_layout.isRefreshing = true;
         page.set(1);
         updateList(state, page.get(), true);
     }
@@ -239,6 +254,9 @@ class TaskActivity : RxAppCompatActivity() {
                 taskListAdapter.notifyDataSetChanged()
                 ptr_layout.setRefreshComplete()
                 updateEmptyView();
+                if(clean){
+                    updateForm()
+                }
             }
 
 
@@ -257,12 +275,22 @@ class TaskActivity : RxAppCompatActivity() {
             }
         }) ;
     }
+    private fun updateForm() {
+        if (taskListAdapter.isEmpty) {
+            taskFormAnimation.show()
+        } else {
+            taskFormAnimation.hide()
+        }
+
+    }
 
     private fun updateEmptyView() {
-        empty.visibility = if (taskListAdapter.isEmpty) {
-            View.VISIBLE
+        if (taskListAdapter.isEmpty) {
+            empty.visibility = View.VISIBLE
+            taskFormAnimation.show()
         } else {
-            View.GONE
+            empty.visibility = View.GONE
+            layout_register_form.visibility = View.GONE
         }
     }
 }
