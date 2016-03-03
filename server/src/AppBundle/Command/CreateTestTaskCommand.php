@@ -31,11 +31,12 @@ class CreateTestTaskCommand extends ContainerAwareCommand
         for ($i = 0; $i < $input->getOption('count'); $i++) {
             $task = new Task();
             $task->setUser($user);
-            $task->setBody($user."_test_task".$i);
+            $task->setBody($user . "_test_task" . $i);
             $manger->persist($task);
+            $output->writeln("<comment>created {$i}: {$task->getBody()} </comment>");
             $manger->flush();
         }
 
-        $output->writeln($input->getOption("user_id") . "::create " . $input->getOption("count")." tasks");
+        $output->writeln("<info>[{$user->getId()}]{$user->getUsername()}::create  {$input->getOption('count')} tasks</info>");
     }
 }

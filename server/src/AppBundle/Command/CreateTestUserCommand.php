@@ -30,14 +30,13 @@ class CreateTestUserCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-//        $manger = $this->getContainer()->get("doctrine")->getManager();
-
+        $password = $input->getArgument("password");
         $userManager = $this->getContainer()->get('fos_user.user_manager');
         $user = $userManager->createUser();
         $user->setEnabled(true);
         $user->setEmail($input->getArgument("email"));
         $user->setEmailCanonical($input->getArgument("email"));
-        $user->setPlainPassword($input->getArgument("password"));
+        $user->setPlainPassword($password);
         $user->setUsername($input->getArgument("name"));
 
         if ($userManager->findUserByUsername($user->getUsername()) || $userManager->findUserByEmail($user->getEmail())) {
@@ -56,7 +55,7 @@ class CreateTestUserCommand extends ContainerAwareCommand
         $em->persist($apiKey);
         $em->flush();
 
-        $output->writeln("<info>created : user{$user->getUsername()} : {$user->getPlainPassword()}</info>");
+        $output->writeln("<info>created user: {$user->getUsername()} : {$password} : {$user->getEmail()}</info>");
         $output->writeln("<info>APiKey: {$apiKey->getToken()}</info>");
     }
 
