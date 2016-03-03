@@ -1,4 +1,5 @@
 package com.kamedon.todo.entity.api
+
 /**
  * ユーザ登録データ
  */
@@ -13,7 +14,7 @@ import java.io.Serializable
  * @param body String
  * @param state {"untreated","process", "complete"}
  */
-data class NewTaskQuery(val body: String, val state: String ="untreated") : Serializable {
+data class NewTaskQuery(val body: String, val state: String = "untreated") : Serializable {
     fun valid(resources: Resources): Map<String, String> {
         val map = mutableMapOf<String, String>()
         if (body.isBlank()) {
@@ -23,4 +24,4 @@ data class NewTaskQuery(val body: String, val state: String ="untreated") : Seri
     }
 }
 
-data class NewTaskResponse(val task: Task, val message: String, val errors: Errors) : Serializable
+data class NewTaskResponse(val code: Int, val task: Task, val message: String, val errors: Errors) : Serializable

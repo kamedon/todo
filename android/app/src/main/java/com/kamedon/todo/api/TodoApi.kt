@@ -19,8 +19,11 @@ object TodoApi {
         @POST("/api/tasks.json")
         fun new(@Body user: NewTaskQuery): Observable<NewTaskResponse>
 
+        @FormUrlEncoded
         @PUT("/api/tasks/{id}.json")
-        fun edit(@Path("id") id: Int, @Query("body") body: String, @Query("body") state: String): Observable<DeleteTaskResponse>
+//        fun edit(@Path("id") id: Int, @Part("body") body: String, @Part("state") state: String): Observable<NewTaskResponse>
+        fun edit(@Path("id") id: Int, @Field("body") body: String, @Field("state") state: String): Observable<NewTaskResponse>
+//        fun edit(@Path("id") id: Int, @Body body: String, @Body state: String): Observable<NewTaskResponse>
 
         @DELETE("/api/tasks/{id}.json")
         fun delete(@Path("id") id: Int): Observable<DeleteTaskResponse>

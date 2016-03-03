@@ -67,21 +67,34 @@ class TaskActivity : RxAppCompatActivity() {
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
         taskListAdapter.onComplete = { view, task, complete ->
-            observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
-                override fun onCompleted() {
-                    updateEmptyView();
-                    Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            observable(api.edit(task.id, task.body, "complete"), object : Subscriber<NewTaskResponse>() {
+                override fun onNext(response: NewTaskResponse) {
+                    Log.d("response",response.toString());
                 }
 
-                override fun onNext(response: DeleteTaskResponse) {
-                    taskListAdapter.list.remove(task)
-                    taskListAdapter.notifyDataSetChanged()
+                override fun onCompleted() {
                 }
 
                 override fun onError(e: Throwable?) {
-                    Log.d("api", "ng:" + e?.message);
+                    Log.d("response",e.toString());
                 }
-            }) ;
+            })
+
+            //            observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
+            //                override fun onCompleted() {
+            //                    updateEmptyView();
+            //                    Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            //                }
+            //
+            //                override fun onNext(response: DeleteTaskResponse) {
+            //                    taskListAdapter.list.remove(task)
+            //                    taskListAdapter.notifyDataSetChanged()
+            //                }
+            //
+            //                override fun onError(e: Throwable?) {
+            //                    Log.d("api", "ng:" + e?.message);
+            //                }
+            //            }) ;
 
         }
         list.adapter = taskListAdapter
@@ -110,7 +123,7 @@ class TaskActivity : RxAppCompatActivity() {
                         Log.d("api", "ng:" + e?.message);
                     }
                 }) ;
-            }else{
+            } else {
                 edit_task.error = errors["task"]
             }
         }
