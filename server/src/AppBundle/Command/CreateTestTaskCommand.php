@@ -10,9 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CreateTestTaskCommand extends ContainerAwareCommand
 {
-    /**
-     *
-     */
     protected function configure()
     {
         $this
