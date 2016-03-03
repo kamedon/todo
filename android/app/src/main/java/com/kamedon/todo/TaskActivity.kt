@@ -131,6 +131,7 @@ class TaskActivity : RxAppCompatActivity() {
 
         list.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(p0: AbsListView?, p1: Int) {
+
             }
 
             //            AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount

@@ -8,6 +8,8 @@
 
 namespace AppBundle\Controller\Api;
 
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+
 
 use AppBundle\Entity\Task;
 use AppBundle\Form\TaskFormType;
@@ -67,21 +69,23 @@ class TaskApiController extends RestController
      *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
      *     }
      * )
-     * @param int $page
+     *
+     * @QueryParam(name="page", nullable=true, requirements="\d+")
      * @param Request $request
      * @return array
      */
-    public function getTasksAction($page = 1, Request $request)
+    public function getTasksAction(Request $request)
     {
+        $page = $request->get("page", 1);
         $user = $this->authUser();
         $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
         $query = $repository->createQueryBuilder('t')
             ->select(["t.id", "t.body", "t.state", "t.createdAt", "t.updatedAt"])
             ->where('t.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('t.createdAt', 'DESC')
+            ->orderBy('t.updatedAt', 'DESC')
             ->setMaxResults(10)
-            ->setFirstResult(($page - 1) * 10  )
+            ->setFirstResult(($page - 1) * 10)
             ->getQuery();
         return $query->getResult();
     }
