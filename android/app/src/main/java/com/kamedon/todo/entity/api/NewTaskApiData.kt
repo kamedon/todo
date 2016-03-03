@@ -25,3 +25,4 @@ data class NewTaskQuery(val body: String, val state: String = "untreated") : Ser
 }
 
 data class NewTaskResponse(val code: Int, val task: Task, val message: String, val errors: Errors) : Serializable
+
