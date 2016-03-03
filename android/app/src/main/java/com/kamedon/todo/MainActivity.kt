@@ -51,7 +51,7 @@ class MainActivity : RxAppCompatActivity() {
                 override fun onNext(response: NewUserResponse) {
                     Log.d("api", "response:${response.toString()}");
                     when (response.code) {
-                        403 -> Snackbar.make(login_form, R.string.error_not_found_user, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                        400 -> Snackbar.make(login_form, R.string.error_not_found_user, Snackbar.LENGTH_LONG).setAction("Action", null).show();
                         200 -> UserService.update(perf.edit(), response)
                     }
                     //

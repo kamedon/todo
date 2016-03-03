@@ -2,6 +2,7 @@ package com.kamedon.todo.dialog
 
 import android.content.DialogInterface
 import android.support.v7.app.AlertDialog
+import android.util.Log
 import android.widget.EditText
 import com.kamedon.todo.R
 import com.kamedon.todo.api.TodoApi
@@ -26,14 +27,21 @@ class SignUpDialog(val api: TodoApi.UserApi) {
             activity.observable(api.new(NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString()))
                     , object : Subscriber<NewUserResponse>() {
                 override fun onCompleted() {
+                    Log.d("api", "onCompleted");
                     onSignUpListener?.onComplete()
                 }
 
                 override fun onNext(response: NewUserResponse) {
-                    UserService.update(UserService.createSharedPreferences(activity.applicationContext).edit(), response)
+                    Log.d("api", "response:${response.toString()}");
+                    when (response.code) {
+                        400 -> Log.d("api", "400");
+                        201 -> UserService.update(UserService.createSharedPreferences(activity.applicationContext).edit(), response)
+                    }
                 }
 
                 override fun onError(e: Throwable?) {
+                    Log.d("api", "${e?.message}");
+
                     onSignUpListener?.onError(e)
                 }
             }) ;
