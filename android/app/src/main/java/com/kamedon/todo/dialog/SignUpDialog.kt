@@ -23,6 +23,7 @@ class SignUpDialog(val api: TodoApi.UserApi) {
         val edit_username = view.findViewById(R.id.edit_username) as EditText
         val edit_email = view.findViewById(R.id.edit_email) as EditText
         val edit_password = view.findViewById(R.id.edit_password) as EditText
+        val edit_password_confirm = view.findViewById(R.id.edit_password_confirm) as EditText
 
         val dialog = AlertDialog.Builder(activity)
                 .setTitle(R.string.title_sign_up)

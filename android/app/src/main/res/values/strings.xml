@@ -30,6 +30,7 @@
     <string name="title_sign_up">Sign Up</string>
     <string name="nothing_task">Nothing</string>
     <string name="error_not_found_user">Not Found User</string>
+    <string name="prompt_password_confirm">Confirm password</string>
 
 
 </resources>
