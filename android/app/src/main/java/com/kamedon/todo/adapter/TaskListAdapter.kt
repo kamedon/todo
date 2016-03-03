@@ -8,7 +8,6 @@ import android.widget.CheckBox
 import android.widget.TextView
 import com.kamedon.todo.R
 import com.kamedon.todo.entity.Task
-import java.util.*
 
 /**
  * Created by kamedon on 2/29/16.
@@ -45,10 +44,17 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<
             holder = convertView.tag as ViewHolder;
             convertView
         }
-        var item = getItem(position);
+        val item = getItem(position);
         holder.textBody.text = item.body
         holder.checkComplete.isChecked = !item.state.equals("untreated")
-        holder.checkComplete.setOnCheckedChangeListener { compoundButton, b -> onComplete(compoundButton, item, true) }
+        holder.checkComplete.setOnCheckedChangeListener { compoundButton, b ->
+            item.state = if (b) {
+                Task.state_complete
+            } else {
+                Task.state_untreated
+            }
+            onComplete(compoundButton, item, true)
+        }
         return layout
     }
 

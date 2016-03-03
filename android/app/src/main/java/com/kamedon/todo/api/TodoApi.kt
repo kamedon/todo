@@ -13,11 +13,18 @@ object TodoApi {
     val BASE_URL = "http://kamedon39.xyz";
 
     interface TaskApi {
+        @GET("/api/tasks.json")
+        fun list(@Query ("page") page: Int = 1): Observable<List<Task>>
+
+        @GET("/api/tasks/{state}.json")
+        fun list(@Path("state") state: String, @Query ("page") page: Int = 1): Observable<List<Task>>
+
         @POST("/api/tasks.json")
         fun new(@Body user: NewTaskQuery): Observable<NewTaskResponse>
 
-        @GET("/api/tasks/{page}.json")
-        fun list(@Path("page") page: Int = 1): Observable<List<Task>>
+        @FormUrlEncoded
+        @PUT("/api/tasks/{id}.json")
+        fun edit(@Path("id") id: Int, @Field("body") body: String, @Field("state") state: String): Observable<NewTaskResponse>
 
         @DELETE("/api/tasks/{id}.json")
         fun delete(@Path("id") id: Int): Observable<DeleteTaskResponse>

@@ -9,6 +9,8 @@
 namespace AppBundle\Controller\Api;
 
 
+use FOS\RestBundle\Controller\Annotations\Route;
+use FOS\RestBundle\Controller\Annotations\Get;
 use AppBundle\Entity\Task;
 use AppBundle\Form\TaskFormType;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -67,27 +69,68 @@ class TaskApiController extends RestController
      *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
      *     }
      * )
-     * @param int $page
+     *
      * @param Request $request
      * @return array
      */
-    public function getTasksAction($page = 1, Request $request)
+    public function getTasksAction(Request $request)
     {
+        $page = $request->get("page", 1);
         $user = $this->authUser();
         $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
         $query = $repository->createQueryBuilder('t')
             ->select(["t.id", "t.body", "t.state", "t.createdAt", "t.updatedAt"])
             ->where('t.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('t.createdAt', 'DESC')
+            ->orderBy('t.updatedAt', 'DESC')
             ->setMaxResults(10)
-            ->setFirstResult(($page - 1) * 10  )
+            ->setFirstResult(($page - 1) * 10)
             ->getQuery();
         return $query->getResult();
     }
 
     /**
      *
+     * @Get("tasks/{state}")
+     * @ApiDoc(
+     *     description="タスク一覧",
+     *     statusCodes={
+     *         200="list task",
+     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
+     *     }
+     * )
+     *
+     * @param string $state
+     * @param Request $request
+     * @return array
+     */
+    public function getTasksStateAction($state, Request $request)
+    {
+        if (!(in_array($state, Task::$STATE) || $state === "all")) {
+            return [];
+        }
+        $page = $request->get("page", 1);
+        $user = $this->authUser();
+        $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
+        $builder = $repository->createQueryBuilder('t')
+            ->select(["t.id", "t.body", "t.state", "t.createdAt", "t.updatedAt"])
+            ->where('t.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('t.updatedAt', 'DESC')
+            ->setMaxResults(10)
+            ->setFirstResult(($page - 1) * 10);
+
+        if ($state !== "all") {
+            $builder->andWhere('t.state = :state')
+                ->setParameter('state', $state);
+        }
+        $query = $builder->getQuery();
+        return $query->getResult();
+    }
+
+    /**
+     *
+     * @Route(requirements={"id"="\d+"})
      * @ApiDoc(
      *     description="タスク削除",
      *     statusCodes={
@@ -111,7 +154,59 @@ class TaskApiController extends RestController
             $manager->flush();
             return ["message" => "completed delete"];
         }
-        throw new \HttpInvalidParamException("invalid task", 400);
+        throw new HttpException(400, "invalid task");
     }
 
+    /**
+     *
+     * @Route(requirements={"id"="\d+"})
+     * @ApiDoc(
+     *     description="タスク変数",
+     *     statusCodes={
+     *         200="edit complete",
+     *         400="taskの情報の不備",
+     *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
+     *     }
+     * )
+     * @param int $id
+     * @param Request $request
+     * @return array
+     * @throws \HttpInvalidParamException
+     */
+    public function putTasksAction($id, Request $request)
+    {
+        $user = $this->authUser();
+        $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
+        $task = $repository->find($id);
+        $form = $this->get('form.factory')->createNamed('', TaskFormType::class, $task, [
+            'method' => 'PUT',
+            'csrf_protection' => false,
+        ]);
+        $form->handleRequest($request);
+        if ($form->isValid() && $task && $user->own($task)) {
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($task);
+            $manager->flush();
+            return ["code" => 201, "message" => "edit complate",
+                "task" => [
+                    "id" => $task->getId(),
+                    "body" => $task->getBody(),
+                    "state" => $task->getState(),
+                    "createdAt" => $task->getCreatedAt(),
+                    "updatedAt" => $task->getUpdatedAt(),
+                ],
+            ];
+        }
+        $errors = $form->getErrors();
+        $errorMessage = [];
+        foreach (["state", "body"] as $key) {
+            $e = $errors->getForm()[$key]->getErrors();
+            if ($e->count() > 0) {
+                $errorMessage[$key] = $e->getForm();
+            } else {
+                $errorMessage[$key]["errors"] = [];
+            }
+        }
+        return ["code" => 400, "errors" => $errorMessage, "message" => "invalid query"];
+    }
 }

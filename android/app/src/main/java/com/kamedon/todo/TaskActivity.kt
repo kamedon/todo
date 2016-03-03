@@ -46,9 +46,13 @@ class TaskActivity : RxAppCompatActivity() {
     lateinit var api: TodoApi.TaskApi
     lateinit var inputMethodManager: InputMethodManager
     lateinit var taskListAdapter: TaskListAdapter
-    var page: AtomicInteger = AtomicInteger(1);
-    private var next: Boolean = true
     lateinit var perf: SharedPreferences
+
+    var subscription: Subscription? = null
+    private var next: Boolean = true
+
+    private var page: AtomicInteger = AtomicInteger(1);
+    private var state: String = Task.state_all;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,21 +71,34 @@ class TaskActivity : RxAppCompatActivity() {
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
         taskListAdapter.onComplete = { view, task, complete ->
-            observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
-                override fun onCompleted() {
-                    updateEmptyView();
-                    Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            observable(api.edit(task.id, task.body, task.state), object : Subscriber<NewTaskResponse>() {
+                override fun onNext(response: NewTaskResponse) {
+                    Log.d("response", response.toString());
                 }
 
-                override fun onNext(response: DeleteTaskResponse) {
-                    taskListAdapter.list.remove(task)
-                    taskListAdapter.notifyDataSetChanged()
+                override fun onCompleted() {
                 }
 
                 override fun onError(e: Throwable?) {
-                    Log.d("api", "ng:" + e?.message);
+                    Log.d("response", e.toString());
                 }
-            }) ;
+            })
+
+            //            observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
+            //                override fun onCompleted() {
+            //                    updateEmptyView();
+            //                    Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            //                }
+            //
+            //                override fun onNext(response: DeleteTaskResponse) {
+            //                    taskListAdapter.list.remove(task)
+            //                    taskListAdapter.notifyDataSetChanged()
+            //                }
+            //
+            //                override fun onError(e: Throwable?) {
+            //                    Log.d("api", "ng:" + e?.message);
+            //                }
+            //            }) ;
 
         }
         list.adapter = taskListAdapter
@@ -102,6 +119,8 @@ class TaskActivity : RxAppCompatActivity() {
                     }
 
                     override fun onNext(response: NewTaskResponse) {
+
+
                         taskListAdapter.list.add(0, response.task)
                     }
 
@@ -110,7 +129,7 @@ class TaskActivity : RxAppCompatActivity() {
                         Log.d("api", "ng:" + e?.message);
                     }
                 }) ;
-            }else{
+            } else {
                 edit_task.error = errors["task"]
             }
         }
@@ -124,13 +143,14 @@ class TaskActivity : RxAppCompatActivity() {
                 .theseChildrenArePullable(R.id.list)
                 .listener { view ->
                     page.set(1)
-                    updateList(1, true);
+                    updateList(state, 1, true);
                 }
                 // Finally commit the setup to our PullToRefreshLayout
                 .setup(ptr_layout);
 
         list.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(p0: AbsListView?, p1: Int) {
+
             }
 
             //            AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount
@@ -138,7 +158,7 @@ class TaskActivity : RxAppCompatActivity() {
                 val process = subscription?.isUnsubscribed ?: false
                 val isLastItemVisible = totalItemCount == list.firstVisiblePosition + visibleItemCount;
                 if (isLastItemVisible && process && next) {
-                    updateList(page.incrementAndGet(), false)
+                    updateList(state, page.incrementAndGet(), false)
                 }
             }
         })
@@ -164,8 +184,6 @@ class TaskActivity : RxAppCompatActivity() {
         val textEmail = header.findViewById(R.id.text_email) as TextView;
         textEmail.text = user.email
 
-        Log.d("user", user.toString());
-
         navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_logout -> {
@@ -173,12 +191,15 @@ class TaskActivity : RxAppCompatActivity() {
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                     finish()
                 }
-
+                R.id.nav_all -> update(Task.state_all)
+                R.id.nav_untreated -> update(Task.state_untreated)
+                R.id.nav_complete -> update(Task.state_complete)
             }
             false
         }
 
     }
+
 
     private fun initToolBar() {
         val toolbar = findViewById(R.id.toolbar) as Toolbar
@@ -196,7 +217,7 @@ class TaskActivity : RxAppCompatActivity() {
     override fun onResume() {
         super.onResume()
         page.set(1);
-        updateList(page.get(), true);
+        updateList(state, page.get(), true);
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -205,10 +226,15 @@ class TaskActivity : RxAppCompatActivity() {
     }
 
 
-    var subscription: Subscription? = null
+    private fun update(state: String) {
+        this.state = state;
+        drawer_layout.closeDrawers()
+        updateList(state, 1, true)
 
-    private fun updateList(page: Int, clean: Boolean) {
-        subscription = observable(api.list(page), object : Subscriber<List<Task>>() {
+    }
+
+    private fun updateList(state: String, page: Int, clean: Boolean) {
+        subscription = observable(api.list(state, page), object : Subscriber<List<Task>>() {
             override fun onCompleted() {
                 taskListAdapter.notifyDataSetChanged()
                 ptr_layout.setRefreshComplete()

@@ -1,5 +1,8 @@
 package com.kamedon.todo.entity.api
 
+/**
+ * ユーザ登録データ
+ */
 import android.content.res.Resources
 import com.kamedon.todo.R
 import com.kamedon.todo.entity.ApiKey
@@ -8,9 +11,10 @@ import com.kamedon.todo.entity.User
 import java.io.Serializable
 
 /**
- * ユーザ登録データ
+ * @param body String
+ * @param state {"untreated","process", "complete"}
  */
-data class NewTaskQuery(val body: String) : Serializable {
+data class NewTaskQuery(val body: String, val state: String = "untreated") : Serializable {
     fun valid(resources: Resources): Map<String, String> {
         val map = mutableMapOf<String, String>()
         if (body.isBlank()) {
@@ -20,18 +24,4 @@ data class NewTaskQuery(val body: String) : Serializable {
     }
 }
 
-/**
- * ユーザ登録のレスとポンス
- *
- * {
- *   "user": {
- *     "id": 2
- *     "username": "kamedon"
- *   },
- *   "api_key": {
- *     "token":  "88848ef4-dea9-11e5-9260-3c970e85851b"
- *   },
- *   "message": "created new user"
- * }
- */
-data class NewTaskResponse(val task: Task, val message: String) : Serializable
+data class NewTaskResponse(val code: Int, val task: Task, val message: String, val errors: Errors) : Serializable
