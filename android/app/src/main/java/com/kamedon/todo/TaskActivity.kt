@@ -112,8 +112,8 @@ class TaskActivity : RxAppCompatActivity() {
                 override fun onComplete() {
                     val view = list.getChildAt(position);
                     taskListAdapter.getView(position, view, list);
-                    //                    taskListAdapter.notifyDataSetChanged()
-                    //                    list.invalidateViews();
+                    //taskListAdapter.notifyDataSetChanged()
+                    //list.invalidateViews();
                     Snackbar.make(layout_register_form, R.string.complete_edit_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
                 }
             }).show(this@TaskActivity, task)
