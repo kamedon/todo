@@ -230,6 +230,7 @@ class TaskActivity : RxAppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        ptr_layout.isRefreshing = true;
         page.set(1);
         updateList(state, page.get(), true);
     }
@@ -253,6 +254,9 @@ class TaskActivity : RxAppCompatActivity() {
                 taskListAdapter.notifyDataSetChanged()
                 ptr_layout.setRefreshComplete()
                 updateEmptyView();
+                if(clean){
+                    updateForm()
+                }
             }
 
 
@@ -271,12 +275,22 @@ class TaskActivity : RxAppCompatActivity() {
             }
         }) ;
     }
+    private fun updateForm() {
+        if (taskListAdapter.isEmpty) {
+            taskFormAnimation.show()
+        } else {
+            taskFormAnimation.hide()
+        }
+
+    }
 
     private fun updateEmptyView() {
-        empty.visibility = if (taskListAdapter.isEmpty) {
-            View.VISIBLE
+        if (taskListAdapter.isEmpty) {
+            empty.visibility = View.VISIBLE
+            taskFormAnimation.show()
         } else {
-            View.GONE
+            empty.visibility = View.GONE
+            layout_register_form.visibility = View.GONE
         }
     }
 }
