@@ -89,23 +89,30 @@ class TaskActivity : RxAppCompatActivity() {
         btn_register.setOnClickListener {
             view ->
             inputMethodManager.hideSoftInputFromWindow(layout_register_form.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-            observable(api.new(NewTaskQuery(edit_task.text.toString())), object : Subscriber<NewTaskResponse>() {
-                override fun onCompleted() {
-                    edit_task.setText("")
-                    taskListAdapter.notifyDataSetChanged()
-                    updateEmptyView();
-                    Snackbar.make(view, R.string.complete_register_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
-                }
+            val query = NewTaskQuery(edit_task.text.toString())
+            val errors = query.valid(resources)
+            if (errors.isEmpty()) {
 
-                override fun onNext(response: NewTaskResponse) {
-                    taskListAdapter.list.add(0, response.task)
-                }
+                observable(api.new(query), object : Subscriber<NewTaskResponse>() {
+                    override fun onCompleted() {
+                        edit_task.setText("")
+                        taskListAdapter.notifyDataSetChanged()
+                        updateEmptyView();
+                        Snackbar.make(view, R.string.complete_register_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                    }
 
-                override fun onError(e: Throwable?) {
+                    override fun onNext(response: NewTaskResponse) {
+                        taskListAdapter.list.add(0, response.task)
+                    }
 
-                    Log.d("api", "ng:" + e?.message);
-                }
-            }) ;
+                    override fun onError(e: Throwable?) {
+
+                        Log.d("api", "ng:" + e?.message);
+                    }
+                }) ;
+            }else{
+                edit_task.error = errors["task"]
+            }
         }
         when (intent?.extras?.getString("user", "") ?: "") {
             "new" -> Snackbar.make(layout_register_form, R.string.welcome, Snackbar.LENGTH_LONG).setAction("Action", null).show()
