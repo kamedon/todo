@@ -9,6 +9,8 @@ data class Task(var id: Int, var body: String, var state: String, var createdAt:
     companion object {
         val state_complete = "complete"
         val state_untreated = "untreated"
+        //query用
+        val state_all = "all"
     }
 
 }

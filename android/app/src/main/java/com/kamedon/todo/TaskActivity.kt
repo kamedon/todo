@@ -46,9 +46,12 @@ class TaskActivity : RxAppCompatActivity() {
     lateinit var api: TodoApi.TaskApi
     lateinit var inputMethodManager: InputMethodManager
     lateinit var taskListAdapter: TaskListAdapter
-    var page: AtomicInteger = AtomicInteger(1);
-    private var next: Boolean = true
     lateinit var perf: SharedPreferences
+
+    private var next: Boolean = true
+
+    private var page: AtomicInteger = AtomicInteger(1);
+    private var state: String = Task.state_all;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,14 +72,14 @@ class TaskActivity : RxAppCompatActivity() {
         taskListAdapter.onComplete = { view, task, complete ->
             observable(api.edit(task.id, task.body, task.state), object : Subscriber<NewTaskResponse>() {
                 override fun onNext(response: NewTaskResponse) {
-                    Log.d("response",response.toString());
+                    Log.d("response", response.toString());
                 }
 
                 override fun onCompleted() {
                 }
 
                 override fun onError(e: Throwable?) {
-                    Log.d("response",e.toString());
+                    Log.d("response", e.toString());
                 }
             })
 
@@ -137,7 +140,7 @@ class TaskActivity : RxAppCompatActivity() {
                 .theseChildrenArePullable(R.id.list)
                 .listener { view ->
                     page.set(1)
-                    updateList(1, true);
+                    updateList(state, 1, true);
                 }
                 // Finally commit the setup to our PullToRefreshLayout
                 .setup(ptr_layout);
@@ -152,7 +155,7 @@ class TaskActivity : RxAppCompatActivity() {
                 val process = subscription?.isUnsubscribed ?: false
                 val isLastItemVisible = totalItemCount == list.firstVisiblePosition + visibleItemCount;
                 if (isLastItemVisible && process && next) {
-                    updateList(page.incrementAndGet(), false)
+                    updateList(state, page.incrementAndGet(), false)
                 }
             }
         })
@@ -210,7 +213,7 @@ class TaskActivity : RxAppCompatActivity() {
     override fun onResume() {
         super.onResume()
         page.set(1);
-        updateList(page.get(), true);
+        updateList(state, page.get(), true);
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -221,8 +224,8 @@ class TaskActivity : RxAppCompatActivity() {
 
     var subscription: Subscription? = null
 
-    private fun updateList(page: Int, clean: Boolean) {
-        subscription = observable(api.list(page), object : Subscriber<List<Task>>() {
+    private fun updateList(state: String, page: Int, clean: Boolean) {
+        subscription = observable(api.list(state, page), object : Subscriber<List<Task>>() {
             override fun onCompleted() {
                 taskListAdapter.notifyDataSetChanged()
                 ptr_layout.setRefreshComplete()
