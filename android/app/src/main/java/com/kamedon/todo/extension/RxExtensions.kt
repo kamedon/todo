@@ -10,12 +10,12 @@ import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
-inline fun <T> Observable<T>.buildScheduler(activity: RxAppCompatActivity): Observable<T> =
-        this.compose(activity.bindToLifecycle<T>())
+inline fun <T> RxAppCompatActivity.observable(observable: Observable<T>) =
+        observable.compose(this.bindToLifecycle<T>())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
-inline fun <T> Observable<T>.execute(activity: RxAppCompatActivity, subscriber: Subscriber<T>): Subscription =
-        this.buildScheduler(activity).subscribe(subscriber)
+inline fun <T> RxAppCompatActivity.observable(observable: Observable<T>, subscriber: Subscriber<T>) =
+        this.observable(observable).subscribe(subscriber)
 
 
