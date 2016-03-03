@@ -69,35 +69,44 @@ class SignUpDialog(val api: TodoApi.UserApi) {
                 .show();
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
             if (equalPassword(edit_password.text.toString(), edit_password_confirm.text.toString())) {
-                activity.observable(api.new(NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString()))
-                        , object : Subscriber<NewUserResponse>() {
-                    override fun onCompleted() {
-                        Log.d("api", "onCompleted");
-                        if (UserService.isLogin(UserService.createSharedPreferences(activity.applicationContext))) {
-                            onSignUpListener?.onComplete()
-                        }
-                    }
-
-                    override fun onNext(response: NewUserResponse) {
-                        Log.d("api", "response:${response.toString()}");
-                        when (response.code) {
-                            400 -> {
-                                val errors = response.errors;
-                                edit_email.error = errors.email?.let { it.errors[0].toString() }
-                                edit_username.error = errors.username?.let { it.errors[0].toString() }
-                                edit_password.error = errors.plainPassword?.let { it.errors[0].toString() }
+                val query = NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString());
+                val error = query.valid(activity.resources)
+                Log.d("text", error.size.toString());
+                if (error.isEmpty()) {
+                    activity.observable(api.new(query)
+                            , object : Subscriber<NewUserResponse>() {
+                        override fun onCompleted() {
+                            Log.d("api", "onCompleted");
+                            if (UserService.isLogin(UserService.createSharedPreferences(activity.applicationContext))) {
+                                onSignUpListener?.onComplete()
                             }
-                            201 -> UserService.update(UserService.createSharedPreferences(activity.applicationContext).edit(), response)
                         }
-                    }
+
+                        override fun onNext(response: NewUserResponse) {
+                            Log.d("api", "response:${response.toString()}");
+                            when (response.code) {
+                                400 -> {
+                                    val errors = response.errors;
+                                    edit_email.error = errors.email?.let { it.errors[0].toString() }
+                                    edit_username.error = errors.username?.let { it.errors[0].toString() }
+                                    edit_password.error = errors.plainPassword?.let { it.errors[0].toString() }
+                                }
+                                201 -> UserService.update(UserService.createSharedPreferences(activity.applicationContext).edit(), response)
+                            }
+                        }
 
 
-                    override fun onError(e: Throwable?) {
-                        Log.d("api", "${e?.message}")
+                        override fun onError(e: Throwable?) {
+                            Log.d("api", "${e?.message}")
 
-                        onSignUpListener?.onError(e)
-                    }
-                }) ;
+                            onSignUpListener?.onError(e)
+                        }
+                    }) ;
+                } else {
+                    edit_username.error = error["username"]
+                    edit_password.error = error["plainPassword"]
+                    edit_email.error = error["email"]
+                }
             } else {
                 edit_password_confirm.error = activity.getString(R.string.error_confirm_password)
             }
