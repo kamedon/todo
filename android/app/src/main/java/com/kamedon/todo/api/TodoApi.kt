@@ -28,7 +28,7 @@ object TodoApi {
         fun new(@Body user: NewUserQuery): Observable<NewUserResponse>
 
         @POST("/api/users/logins.json")
-        fun login(@Body user: LoginUserApiData): Observable<NewUserResponse>
+        fun login(@Body user: LoginUserQuery): Observable<NewUserResponse>
     }
 
 

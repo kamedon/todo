@@ -9,14 +9,13 @@ import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.dialog.SignUpDialog
 import com.kamedon.todo.entity.api.Errors
-import com.kamedon.todo.entity.api.LoginUserApiData
+import com.kamedon.todo.entity.api.LoginUserQuery
 import com.kamedon.todo.entity.api.NewUserResponse
 import com.kamedon.todo.extension.buildIntent
 import com.kamedon.todo.extension.observable
 import com.kamedon.todo.service.UserService
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_task.*
 import rx.Subscriber
 
 /**
@@ -38,30 +37,39 @@ class MainActivity : RxAppCompatActivity() {
         val client = ApiClientBuilder.createApi();
         val api = TodoApiBuilder.buildUserApi(client);
         btn_login.setOnClickListener {
-            observable(api.login(LoginUserApiData(edit_username.text.toString(), edit_password.text.toString())), object : Subscriber<NewUserResponse>() {
-                override fun onCompleted() {
-                    if (UserService.isLogin(perf)) {
-                        val intent = buildIntent(TaskActivity::class.java)
-                        intent.putExtra("user", "login");
-                        startActivity(intent);
-                        finish()
+            val query = LoginUserQuery(edit_username.text.toString(), edit_password.text.toString());
+            val errors = query.valid(resources)
+            if (errors.isEmpty()) {
+                observable(api.login(query), object : Subscriber<NewUserResponse>() {
+                    override fun onCompleted() {
+                        if (UserService.isLogin(perf)) {
+                            val intent = buildIntent(TaskActivity::class.java)
+                            intent.putExtra("user", "login");
+                            startActivity(intent);
+                            finish()
+                        }
+
                     }
 
-                }
-
-                override fun onNext(response: NewUserResponse) {
-                    Log.d("api", "response:${response.toString()}");
-                    when (response.code) {
-                        400 -> Snackbar.make(login_form, R.string.error_not_found_user, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                        200 -> UserService.update(perf.edit(), response)
+                    override fun onNext(response: NewUserResponse) {
+//                        Log.d("api", "response:${response.toString()}");
+                        when (response.code) {
+                            400 -> Snackbar.make(login_form, R.string.error_not_found_user, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                            200 -> UserService.update(perf.edit(), response)
+                        }
+                        //
                     }
-                    //
-                }
 
-                override fun onError(e: Throwable?) {
-                    Log.d("api", "ng:" + e?.message);
-                }
-            })
+                    override fun onError(e: Throwable?) {
+//                        Log.d("api", "ng:" + e?.message);
+                    }
+                })
+            } else {
+                Log.d("text", "render")
+//                edit_username.text.toString(), edit_password.text.toString()
+                edit_password.error = errors["password"]
+                edit_username.error = errors["user"]
+            }
         }
 
         btn_signIn.setOnClickListener {
@@ -70,7 +78,6 @@ class MainActivity : RxAppCompatActivity() {
                 }
 
                 override fun onComplete() {
-                    Log.d("api", "onCompleted");
                     val intent = buildIntent(TaskActivity::class.java)
                     intent.putExtra("user", "new");
                     startActivity(intent);
