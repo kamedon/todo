@@ -36,13 +36,13 @@ class NewUserRequest
 
     /**
      * @Assert\NotBlank(
-     *    message = "name should not be blank."
+     *    message = "password should not be blank."
      * )
      * @Assert\Length(
-     *      min = 2,
+     *      min = 3,
      *      max = 16,
-     *      minMessage = "password must be at least {{ limit }} characters long",
-     *      maxMessage = "password cannot be longer than {{ limit }} characters"
+     *      minMessage = "name must be at least {{ limit }} characters long",
+     *      maxMessage = "name cannot be longer than {{ limit }} characters"
      * )
      */
     protected $username;

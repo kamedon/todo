@@ -8,6 +8,7 @@ import android.util.Log
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.dialog.SignUpDialog
+import com.kamedon.todo.entity.api.Errors
 import com.kamedon.todo.entity.api.LoginUserApiData
 import com.kamedon.todo.entity.api.NewUserResponse
 import com.kamedon.todo.extension.buildIntent
@@ -65,6 +66,9 @@ class MainActivity : RxAppCompatActivity() {
 
         btn_signIn.setOnClickListener {
             SignUpDialog(api).show(this@MainActivity, object : SignUpDialog.OnSignUpListener {
+                override fun onInvalidQuery(errors: Errors) {
+                }
+
                 override fun onComplete() {
                     Log.d("api", "onCompleted");
                     val intent = buildIntent(TaskActivity::class.java)
