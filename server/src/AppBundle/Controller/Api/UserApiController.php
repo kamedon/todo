@@ -54,7 +54,7 @@ class UserApiController extends RestController
             $user->setUsername($u->getUsername());
 
             if ($userManager->findUserByUsername($user->getUsername()) || $userManager->findUserByEmail($user->getEmail())) {
-                return ["code" => 400, "message" => "It has already been registered"];
+                return ["code" => 400, "errors" => ["invalid" => ["errors" => "It has already been registered"]], "message" => "It has already been registered"];
             }
 
             try {
@@ -80,23 +80,18 @@ class UserApiController extends RestController
                 'message' => "created new user"
             ];
         }
-        $errors = $form->getErrors(false, false);
-        if ($errors->count() === 0) {
-            return ["code" => 400, "message" => ["There is no query data"]];
-        } else {
-//            return ["code" => 400, "message" => $errors->getChildren()];
-            $e = [];
-            foreach ($errors->getForm() as $key => $value) {
-                $e[$key][] = $value;
+        $errors = $form->getErrors(true, false);
+
+        $errorMessage = [];
+        foreach (["email", "username", "plainPassword"] as $key) {
+            $e = $errors->getForm()[$key]->getErrors();
+            if ($e->count() > 0) {
+                $errorMessage[$key] = $e->getForm();
+            } else {
+                $errorMessage[$key]["errors"] = [];
             }
-            $massage = [];
-            foreach ($e as $index => $item) {
-                foreach ($item as $key => $value) {
-                    $massage[$index] = $value;
-                }
-            }
-            return ["code" => 400, "message" => $massage];
         }
+        return ["code" => 400, "errors" => $errorMessage, "message" => "invalid query"];
     }
 
     /**
@@ -115,14 +110,14 @@ class UserApiController extends RestController
         $this->auth();
         $user = $this->get("fos_user.user_manager")->findUserByUsernameOrEmail($request->get("user"));
         if (!$user) {
-            return ["code" => 403, "message" => "not found user:"];
+            return ["code" => 400, "errors" => ["invalid" => ["errors" => "It has already been registered"]], "message" => "not found user"];
         }
         $factory = $this->get('security.encoder_factory');
         $encoder = $factory->getEncoder($user);
 
         $isValidPassword = ($encoder->isPasswordValid($user->getPassword(), $request->get("password"), $user->getSalt())) ? true : false;
         if (!$isValidPassword) {
-            return ["code" => 403, "message" => "not found user"];
+            return ["code" => 400, "errors" => ["invalid" => ["errors" => "It has already been registered"]], "message" => "not found user"];
         }
 
         $keyApi = $this->getDoctrine()->getRepository("AppBundle:ApiKey")->findOneBy(["user" => $user]);
