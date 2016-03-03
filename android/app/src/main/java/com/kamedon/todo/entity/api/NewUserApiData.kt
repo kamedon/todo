@@ -1,7 +1,12 @@
 package com.kamedon.todo.entity.api
 
+import android.content.res.Resources
+import android.util.Log
+import com.kamedon.todo.R
 import com.kamedon.todo.entity.ApiKey
 import com.kamedon.todo.entity.User
+import com.kamedon.todo.extension.between
+import com.kamedon.todo.extension.isMail
 import java.io.Serializable
 
 
@@ -9,7 +14,24 @@ import java.io.Serializable
  *
  * ユーザ登録データ
  */
-data class NewUserQuery(val username: String, val email: String, val plainPassword: String) : Serializable
+data class NewUserQuery(val username: String, val email: String, val plainPassword: String) : Serializable {
+    fun valid(resources: Resources ): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        if (!username.length.between(3, 16)) {
+            map.put("username", resources.getString(R.string.error_length_between, 3, 16))
+        }
+        if (!plainPassword.length.between(6, 16)) {
+            map.put("plainPassword", resources.getString(R.string.error_length_between, 6, 16))
+        }
+        if (email.isEmpty()) {
+            map.put("email", resources.getString(R.string.error_blank))
+        }
+        if (!email.isMail()) {
+            map.put("email", resources.getString(R.string.error_invalid_email))
+        }
+        return map
+    }
+}
 
 /**
  * ユーザ登録のレスとポンス
