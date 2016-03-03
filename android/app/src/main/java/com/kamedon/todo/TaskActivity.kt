@@ -205,9 +205,9 @@ class TaskActivity : RxAppCompatActivity() {
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                     finish()
                 }
-                R.id.nav_all -> update(Task.state_all)
-                R.id.nav_untreated -> update(Task.state_untreated)
-                R.id.nav_complete -> update(Task.state_complete)
+                R.id.nav_all -> update(Task.state_all, R.string.title_task_all)
+                R.id.nav_untreated -> update(Task.state_untreated, R.string.title_task_untreated)
+                R.id.nav_complete -> update(Task.state_complete, R.string.title_task_complete)
             }
             false
         }
@@ -241,11 +241,16 @@ class TaskActivity : RxAppCompatActivity() {
     }
 
 
-    private fun update(state: String) {
-        this.state = state;
-        drawer_layout.closeDrawers()
+    private fun update(state: String, stringId: Int) {
+        next = true
+        updateHeader(state,stringId)
         updateList(state, 1, true)
+    }
 
+    private fun updateHeader(state: String, stringId: Int) {
+        this.state = state;
+        toolbar.title = getString(stringId)
+        drawer_layout.closeDrawers()
     }
 
     private fun updateList(state: String, page: Int, clean: Boolean) {
@@ -254,7 +259,7 @@ class TaskActivity : RxAppCompatActivity() {
                 taskListAdapter.notifyDataSetChanged()
                 ptr_layout.setRefreshComplete()
                 updateEmptyView();
-                if(clean){
+                if (clean) {
                     updateForm()
                 }
             }
@@ -275,6 +280,7 @@ class TaskActivity : RxAppCompatActivity() {
             }
         }) ;
     }
+
     private fun updateForm() {
         if (taskListAdapter.isEmpty) {
             taskFormAnimation.show()
