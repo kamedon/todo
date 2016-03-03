@@ -13,15 +13,16 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.AbsListView
+import android.widget.AdapterView
 import android.widget.TextView
 import com.kamedon.todo.adapter.TaskListAdapter
 import com.kamedon.todo.anim.TaskFormAnimation
 import com.kamedon.todo.api.TodoApi
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
+import com.kamedon.todo.dialog.EditTaskDialog
 import com.kamedon.todo.entity.Task
 import com.kamedon.todo.entity.User
-import com.kamedon.todo.entity.api.DeleteTaskResponse
 import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
 import com.kamedon.todo.extension.observable
@@ -101,6 +102,21 @@ class TaskActivity : RxAppCompatActivity() {
             //            }) ;
 
         }
+        taskListAdapter.onItemLongClickListener = { EditTaskDialog(api).setOnDeleteLisetener(object : EditTaskDialog.OnDeleteListener{
+            override fun onDelete(task: Task) {
+                taskListAdapter.list.remove(task)
+            }
+
+            override fun onError(e: Throwable?) {
+            }
+
+            override fun onComplete(task: Task) {
+                updateEmptyView();
+                taskListAdapter.notifyDataSetChanged()
+                Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            }
+
+        }).show(this@TaskActivity, it) }
         list.adapter = taskListAdapter
 
         btn_register.setOnClickListener {
@@ -109,7 +125,6 @@ class TaskActivity : RxAppCompatActivity() {
             val query = NewTaskQuery(edit_task.text.toString())
             val errors = query.valid(resources)
             if (errors.isEmpty()) {
-
                 observable(api.new(query), object : Subscriber<NewTaskResponse>() {
                     override fun onCompleted() {
                         edit_task.setText("")

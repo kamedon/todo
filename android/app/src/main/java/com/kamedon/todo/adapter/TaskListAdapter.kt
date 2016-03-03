@@ -1,5 +1,6 @@
 package com.kamedon.todo.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import com.kamedon.todo.entity.Task
  */
 class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<Task>) : BaseAdapter() {
     var onComplete: (View, Task, Boolean) -> Unit = { view, task, complete -> }
+    var onItemLongClickListener: (Task) -> Unit = { }
 
     override fun getCount(): Int {
         return list.size
@@ -28,19 +30,13 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
-        // Viewがリサイクル出来ない場合
         var holder: ViewHolder;
         var layout = if (convertView == null) {
-            // Viewにレイアウトの情報を登録する
             val view = layoutInflater.inflate(R.layout.list_task, null);
-            // Viewがリサイクル出来る場合はnewする必要がないので、holderはここでnewする
             holder = ViewHolder(view);
-            // リサイクルするときのためにタグ付けしておく
             view.tag = holder;
             view
         } else {
-            // Viewがリサイクル出来る場合
-            // タグ付けしておいた情報を取得する
             holder = convertView.tag as ViewHolder;
             convertView
         }
@@ -55,6 +51,7 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<
             }
             onComplete(compoundButton, item, true)
         }
+        layout.setOnLongClickListener { onItemLongClickListener(getItem(position));false }
         return layout
     }
 
