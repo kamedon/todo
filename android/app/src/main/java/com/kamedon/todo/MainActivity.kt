@@ -40,6 +40,7 @@ class MainActivity : RxAppCompatActivity() {
             val query = LoginUserQuery(edit_username.text.toString(), edit_password.text.toString());
             val errors = query.valid(resources)
             if (errors.isEmpty()) {
+                Log.d("api", "api");
                 observable(api.login(query), object : Subscriber<NewUserResponse>() {
                     override fun onCompleted() {
                         if (UserService.isLogin(perf)) {
@@ -52,7 +53,7 @@ class MainActivity : RxAppCompatActivity() {
                     }
 
                     override fun onNext(response: NewUserResponse) {
-//                        Log.d("api", "response:${response.toString()}");
+                        Log.d("api", "response:${response.toString()}");
                         when (response.code) {
                             400 -> Snackbar.make(login_form, R.string.error_not_found_user, Snackbar.LENGTH_LONG).setAction("Action", null).show();
                             200 -> UserService.update(perf.edit(), response)
@@ -61,12 +62,10 @@ class MainActivity : RxAppCompatActivity() {
                     }
 
                     override fun onError(e: Throwable?) {
-//                        Log.d("api", "ng:" + e?.message);
+                        Log.d("api", "ng:" + e?.message);
                     }
                 })
             } else {
-                Log.d("text", "render")
-//                edit_username.text.toString(), edit_password.text.toString()
                 edit_password.error = errors["password"]
                 edit_username.error = errors["user"]
             }

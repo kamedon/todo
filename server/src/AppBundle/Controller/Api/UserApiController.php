@@ -110,14 +110,14 @@ class UserApiController extends RestController
         $this->auth();
         $user = $this->get("fos_user.user_manager")->findUserByUsernameOrEmail($request->get("user"));
         if (!$user) {
-            return ["code" => 400, "errors" => ["other" => ["errors" => "It has already been registered"]], "message" => "not found user"];
+            return ["code" => 400, "errors" => ["other" => ["errors" => ["It has already been registered"]], "message" => "not found user"]];
         }
         $factory = $this->get('security.encoder_factory');
         $encoder = $factory->getEncoder($user);
 
         $isValidPassword = ($encoder->isPasswordValid($user->getPassword(), $request->get("password"), $user->getSalt())) ? true : false;
         if (!$isValidPassword) {
-            return ["code" => 400, "errors" => ["other" => ["errors" => "It has already been registered"]], "message" => "not found user"];
+            return ["code" => 400, "errors" => ["other" => ["errors" => ["It has already been registered"]], "message" => "not found user"]];
         }
 
         $keyApi = $this->getDoctrine()->getRepository("AppBundle:ApiKey")->findOneBy(["user" => $user]);
