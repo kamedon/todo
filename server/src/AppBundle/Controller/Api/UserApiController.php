@@ -54,13 +54,12 @@ class UserApiController extends RestController
             $user->setUsername($u->getUsername());
 
             if ($userManager->findUserByUsername($user->getUsername()) || $userManager->findUserByEmail($user->getEmail())) {
-                throw new HttpException(400, "not unique user");
+                return ["code" => 400, "message" => "It has already been registered"];
             }
 
             try {
                 $userManager->updateUser($user);
             } catch (Exception $e) {
-                throw new HttpException(400, "New User is not valid.");
             }
             $key = \Ramsey\Uuid\Uuid::uuid1()->toString();
             $apiKey = new ApiKey();
@@ -71,6 +70,7 @@ class UserApiController extends RestController
             $em->flush();
 
             return [
+                'code' => 201,
                 'user' => [
                     'id' => $user->getId(),
                     'username' => $user->getUsername(),
@@ -80,8 +80,23 @@ class UserApiController extends RestController
                 'message' => "created new user"
             ];
         }
-        throw new HttpException(400, "New User is not valid.");
-
+        $errors = $form->getErrors(false, false);
+        if ($errors->count() === 0) {
+            return ["code" => 400, "message" => ["There is no query data"]];
+        } else {
+//            return ["code" => 400, "message" => $errors->getChildren()];
+            $e = [];
+            foreach ($errors->getForm() as $key => $value) {
+                $e[$key][] = $value;
+            }
+            $massage = [];
+            foreach ($e as $index => $item) {
+                foreach ($item as $key => $value) {
+                    $massage[$index] = $value;
+                }
+            }
+            return ["code" => 400, "message" => $massage];
+        }
     }
 
     /**
@@ -111,7 +126,7 @@ class UserApiController extends RestController
         }
 
         $keyApi = $this->getDoctrine()->getRepository("AppBundle:ApiKey")->findOneBy(["user" => $user]);
-        if(!$keyApi){
+        if (!$keyApi) {
             $key = \Ramsey\Uuid\Uuid::uuid1()->toString();
             $keyApi = new ApiKey();
             $keyApi->setUser($user);
@@ -120,13 +135,12 @@ class UserApiController extends RestController
             $manager->persist($keyApi);
             $manager->flush();
         }
-//        return [$keyApi,$user];
-
         return [
+            'code' => 200,
             'user' => [
                 'id' => $user->getId(),
-                 'username' => $user->getUsername(),
-                 'email' => $user->getEmail()
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail()
             ],
             'api_key' => ["token" => $keyApi->getToken()],
             'message' => "login success"
