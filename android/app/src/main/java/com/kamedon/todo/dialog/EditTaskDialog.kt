@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.kamedon.todo.R
 import com.kamedon.todo.api.TodoApi
@@ -21,6 +22,7 @@ import rx.Subscriber
 class EditTaskDialog(val api: TodoApi.TaskApi) {
     private var onDeleteListener: EditTaskDialog.OnDeleteListener? = null
     private var onEditListener: EditTaskDialog.OnEditListener? = null
+    private var inputMethodManager: InputMethodManager? = null
 
     fun setOnEditListener(listener: OnEditListener): EditTaskDialog {
         onEditListener = listener
@@ -44,6 +46,7 @@ class EditTaskDialog(val api: TodoApi.TaskApi) {
                 .setNeutralButton(R.string.action_delete, { dialog, which ->
                     activity.observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
                         override fun onCompleted() {
+                            inputMethodManager?.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
                             onDeleteListener?.onComplete();
                         }
 
@@ -52,6 +55,7 @@ class EditTaskDialog(val api: TodoApi.TaskApi) {
                         }
 
                         override fun onError(e: Throwable?) {
+                            inputMethodManager?.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
                             onDeleteListener?.onError(e);
                         }
                     }) ;
@@ -63,6 +67,7 @@ class EditTaskDialog(val api: TodoApi.TaskApi) {
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
             activity.observable(api.edit(task.id, edit_body.text.toString(), task.state), object : Subscriber<NewTaskResponse>() {
                 override fun onCompleted() {
+                    inputMethodManager?.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
                     onEditListener?.onComplete()
                     dialog.dismiss()
                 }
@@ -73,6 +78,7 @@ class EditTaskDialog(val api: TodoApi.TaskApi) {
                 }
 
                 override fun onError(e: Throwable?) {
+                    inputMethodManager?.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
                     onEditListener?.onError(e)
                 }
             })
@@ -96,6 +102,12 @@ class EditTaskDialog(val api: TodoApi.TaskApi) {
 
         fun onComplete()
 
+    }
+
+
+    fun setInputMethodManager(inputMethodManager: InputMethodManager): EditTaskDialog{
+        this.inputMethodManager = inputMethodManager;
+        return this
     }
 
 }
