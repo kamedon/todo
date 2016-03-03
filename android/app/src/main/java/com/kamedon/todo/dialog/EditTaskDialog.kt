@@ -20,11 +20,18 @@ import rx.Subscriber
  */
 class EditTaskDialog(val api: TodoApi.TaskApi) {
     private var onDeleteListener: EditTaskDialog.OnDeleteListener? = null
+    private var onEditListener: EditTaskDialog.OnEditListener? = null
 
-    fun setOnDeleteLisetener(listener: OnDeleteListener): EditTaskDialog {
+    fun setOnEditListener(listener: OnEditListener): EditTaskDialog {
+        onEditListener = listener
+        return this
+    }
+
+    fun setOnDeleteListener(listener: OnDeleteListener): EditTaskDialog {
         onDeleteListener = listener
         return this
     }
+
     fun show(activity: RxAppCompatActivity, task: Task) {
         var view = activity.layoutInflater.inflate(R.layout.dialog_edit_task, null)
         val edit_body = view.findViewById(R.id.edit_body) as EditText
@@ -37,7 +44,7 @@ class EditTaskDialog(val api: TodoApi.TaskApi) {
                 .setNeutralButton(R.string.action_delete, { dialog, which ->
                     activity.observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
                         override fun onCompleted() {
-                            onDeleteListener?.onComplete(task);
+                            onDeleteListener?.onComplete();
                         }
 
                         override fun onNext(response: DeleteTaskResponse) {
@@ -56,24 +63,38 @@ class EditTaskDialog(val api: TodoApi.TaskApi) {
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
             activity.observable(api.edit(task.id, edit_body.text.toString(), task.state), object : Subscriber<NewTaskResponse>() {
                 override fun onCompleted() {
+                    onEditListener?.onComplete()
+                    dialog.dismiss()
                 }
 
                 override fun onNext(response: NewTaskResponse) {
+                    task.body = response.task.body
+                    onEditListener?.onEdit(response.task)
                 }
 
                 override fun onError(e: Throwable?) {
+                    onEditListener?.onError(e)
                 }
             })
         }
 
     }
 
-    interface OnDeleteListener{
+    interface OnEditListener {
+        fun onEdit(task: Task)
+
+        fun onError(e: Throwable?)
+
+        fun onComplete()
+
+    }
+
+    interface OnDeleteListener {
         fun onDelete(task: Task)
 
         fun onError(e: Throwable?)
 
-        fun onComplete(task: Task)
+        fun onComplete()
 
     }
 

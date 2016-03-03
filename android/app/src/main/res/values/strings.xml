@@ -37,6 +37,7 @@
     <string name="action_edit">edit</string>
     <string name="action_delete">delete</string>
     <string name="nothing_task">Nothing</string>
+    <string name="complete_edit_task">edited</string>
     <string name="error_not_found_user">Not Found User</string>
     <string name="prompt_password_confirm">Confirm password</string>
     <string name="error_confirm_password">Not equal password</string>

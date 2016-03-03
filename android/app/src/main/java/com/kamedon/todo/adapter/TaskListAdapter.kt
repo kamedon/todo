@@ -15,7 +15,7 @@ import com.kamedon.todo.entity.Task
  */
 class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<Task>) : BaseAdapter() {
     var onComplete: (View, Task, Boolean) -> Unit = { view, task, complete -> }
-    var onItemLongClickListener: (Task) -> Unit = { }
+    var onItemLongClickListener: (Int, Task) -> Unit = { position, task -> }
 
     override fun getCount(): Int {
         return list.size
@@ -51,7 +51,8 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<
             }
             onComplete(compoundButton, item, true)
         }
-        layout.setOnLongClickListener { onItemLongClickListener(getItem(position));false }
+        layout.setOnLongClickListener { onItemLongClickListener(position, getItem(position));false }
+
         return layout
     }
 

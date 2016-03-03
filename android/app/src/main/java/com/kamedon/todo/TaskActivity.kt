@@ -84,39 +84,38 @@ class TaskActivity : RxAppCompatActivity() {
                     Log.d("response", e.toString());
                 }
             })
-
-            //            observable(api.delete(task.id), object : Subscriber<DeleteTaskResponse>() {
-            //                override fun onCompleted() {
-            //                    updateEmptyView();
-            //                    Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
-            //                }
-            //
-            //                override fun onNext(response: DeleteTaskResponse) {
-            //                    taskListAdapter.list.remove(task)
-            //                    taskListAdapter.notifyDataSetChanged()
-            //                }
-            //
-            //                override fun onError(e: Throwable?) {
-            //                    Log.d("api", "ng:" + e?.message);
-            //                }
-            //            }) ;
-
         }
-        taskListAdapter.onItemLongClickListener = { EditTaskDialog(api).setOnDeleteLisetener(object : EditTaskDialog.OnDeleteListener{
-            override fun onDelete(task: Task) {
-                taskListAdapter.list.remove(task)
-            }
+        taskListAdapter.onItemLongClickListener = { position, task ->
+            EditTaskDialog(api).setOnDeleteListener(object : EditTaskDialog.OnDeleteListener {
+                override fun onDelete(task: Task) {
+                    taskListAdapter.list.remove(task)
+                }
 
-            override fun onError(e: Throwable?) {
-            }
+                override fun onError(e: Throwable?) {
+                }
 
-            override fun onComplete(task: Task) {
-                updateEmptyView();
-                taskListAdapter.notifyDataSetChanged()
-                Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
-            }
+                override fun onComplete() {
+                    updateEmptyView();
+                    taskListAdapter.notifyDataSetChanged()
+                    Snackbar.make(layout_register_form, R.string.complete_delete_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                }
 
-        }).show(this@TaskActivity, it) }
+            }).setOnEditListener(object : EditTaskDialog.OnEditListener {
+                override fun onEdit(task: Task) {
+                }
+
+                override fun onError(e: Throwable?) {
+                }
+
+                override fun onComplete() {
+//                    val view = list.getChildAt(position);
+//                    taskListAdapter.getView(position, view, list);
+                    taskListAdapter.notifyDataSetChanged()
+                    list.invalidateViews();
+                    Snackbar.make(layout_register_form, R.string.complete_edit_task, Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                }
+            }).show(this@TaskActivity, task)
+        }
         list.adapter = taskListAdapter
 
         btn_register.setOnClickListener {
@@ -134,8 +133,6 @@ class TaskActivity : RxAppCompatActivity() {
                     }
 
                     override fun onNext(response: NewTaskResponse) {
-
-
                         taskListAdapter.list.add(0, response.task)
                     }
 
