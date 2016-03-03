@@ -16,14 +16,15 @@ object TodoApi {
         @GET("/api/tasks.json")
         fun list(@Query ("page") page: Int = 1): Observable<List<Task>>
 
+        @GET("/api/tasks/{state}.json")
+        fun list(@Path("state") state: String, @Query ("page") page: Int = 1): Observable<List<Task>>
+
         @POST("/api/tasks.json")
         fun new(@Body user: NewTaskQuery): Observable<NewTaskResponse>
 
         @FormUrlEncoded
         @PUT("/api/tasks/{id}.json")
-//        fun edit(@Path("id") id: Int, @Part("body") body: String, @Part("state") state: String): Observable<NewTaskResponse>
         fun edit(@Path("id") id: Int, @Field("body") body: String, @Field("state") state: String): Observable<NewTaskResponse>
-//        fun edit(@Path("id") id: Int, @Body body: String, @Body state: String): Observable<NewTaskResponse>
 
         @DELETE("/api/tasks/{id}.json")
         fun delete(@Path("id") id: Int): Observable<DeleteTaskResponse>

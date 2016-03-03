@@ -67,7 +67,7 @@ class TaskActivity : RxAppCompatActivity() {
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager;
         taskListAdapter = TaskListAdapter(layoutInflater, CopyOnWriteArrayList());
         taskListAdapter.onComplete = { view, task, complete ->
-            observable(api.edit(task.id, task.body, "complete"), object : Subscriber<NewTaskResponse>() {
+            observable(api.edit(task.id, task.body, task.state), object : Subscriber<NewTaskResponse>() {
                 override fun onNext(response: NewTaskResponse) {
                     Log.d("response",response.toString());
                 }
