@@ -48,6 +48,7 @@ class TaskActivity : RxAppCompatActivity() {
     lateinit var taskListAdapter: TaskListAdapter
     lateinit var perf: SharedPreferences
 
+    var subscription: Subscription? = null
     private var next: Boolean = true
 
     private var page: AtomicInteger = AtomicInteger(1);
@@ -118,6 +119,8 @@ class TaskActivity : RxAppCompatActivity() {
                     }
 
                     override fun onNext(response: NewTaskResponse) {
+
+
                         taskListAdapter.list.add(0, response.task)
                     }
 
@@ -181,8 +184,6 @@ class TaskActivity : RxAppCompatActivity() {
         val textEmail = header.findViewById(R.id.text_email) as TextView;
         textEmail.text = user.email
 
-        Log.d("user", user.toString());
-
         navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_logout -> {
@@ -190,12 +191,15 @@ class TaskActivity : RxAppCompatActivity() {
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                     finish()
                 }
-
+                R.id.nav_all -> update(Task.state_all)
+                R.id.nav_untreated -> update(Task.state_untreated)
+                R.id.nav_complete -> update(Task.state_complete)
             }
             false
         }
 
     }
+
 
     private fun initToolBar() {
         val toolbar = findViewById(R.id.toolbar) as Toolbar
@@ -222,7 +226,12 @@ class TaskActivity : RxAppCompatActivity() {
     }
 
 
-    var subscription: Subscription? = null
+    private fun update(state: String) {
+        this.state = state;
+        drawer_layout.closeDrawers()
+        updateList(state, 1, true)
+
+    }
 
     private fun updateList(state: String, page: Int, clean: Boolean) {
         subscription = observable(api.list(state, page), object : Subscriber<List<Task>>() {
