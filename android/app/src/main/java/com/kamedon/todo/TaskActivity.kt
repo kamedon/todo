@@ -13,7 +13,6 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.AbsListView
-import android.widget.AdapterView
 import android.widget.TextView
 import com.kamedon.todo.adapter.TaskListAdapter
 import com.kamedon.todo.anim.TaskFormAnimation
@@ -54,7 +53,7 @@ class TaskActivity : RxAppCompatActivity() {
     private var next: AtomicBoolean = AtomicBoolean(true)
 
     private var page: AtomicInteger = AtomicInteger(1);
-    private var state: String = Task.state_all;
+    private var state: String = Task.state_untreated;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

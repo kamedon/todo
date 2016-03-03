@@ -24,7 +24,7 @@
         <activity
             android:name=".TaskActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/title_task_all" />
+            android:label="@string/title_task_untreated" />
     </application>
 
 </manifest>
