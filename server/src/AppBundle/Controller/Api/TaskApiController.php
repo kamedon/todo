@@ -75,6 +75,7 @@ class TaskApiController extends RestController
      */
     public function getTasksAction(Request $request)
     {
+        $limit = $this->getParameter("page_limit");
         $page = $request->get("page", 1);
         $user = $this->authUser();
         $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
@@ -83,8 +84,8 @@ class TaskApiController extends RestController
             ->where('t.user = :user')
             ->setParameter('user', $user)
             ->orderBy('t.updatedAt', 'DESC')
-            ->setMaxResults(10)
-            ->setFirstResult(($page - 1) * 10)
+            ->setMaxResults($limit)
+            ->setFirstResult(($page - 1) * $limit)
             ->getQuery();
         return $query->getResult();
     }
@@ -109,6 +110,7 @@ class TaskApiController extends RestController
         if (!(in_array($state, Task::$STATE) || $state === "all")) {
             return [];
         }
+        $limit = $this->getParameter("page_limit");
         $page = $request->get("page", 1);
         $user = $this->authUser();
         $repository = $this->getDoctrine()->getRepository("AppBundle:Task");
@@ -117,8 +119,8 @@ class TaskApiController extends RestController
             ->where('t.user = :user')
             ->setParameter('user', $user)
             ->orderBy('t.createdAt', 'DESC')
-            ->setMaxResults(10)
-            ->setFirstResult(($page - 1) * 10);
+            ->setMaxResults($limit)
+            ->setFirstResult(($page - 1) * $limit);
 
         if ($state !== "all") {
             $builder->andWhere('t.state = :state')
