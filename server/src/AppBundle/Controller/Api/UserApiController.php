@@ -10,9 +10,9 @@ namespace AppBundle\Controller\Api;
 
 
 use AppBundle\Entity\ApiKey;
-use AppBundle\Entity\NewUserRequest;
+use AppBundle\Entity\Query\NewUserQuery;
 use AppBundle\Form\NewUserFormType;
-use AppBundle\Form\UserType;
+use FOS\UserBundle\Propel\UserQuery;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -39,7 +39,7 @@ class UserApiController extends RestController
         $user = $userManager->createUser();
         $user->setEnabled(true);
 
-        $u = new NewUserRequest();
+        $u = new NewUserQuery();
         $form = $this->get('form.factory')->createNamed('', NewUserFormType::class, $u, [
             'method' => 'POST',
             'csrf_protection' => false,
