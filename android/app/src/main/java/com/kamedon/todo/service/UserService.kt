@@ -29,7 +29,6 @@ object UserService {
     }
 
     fun updateUser(editor: SharedPreferences.Editor, user: User) {
-        Log.d("update", "data" + user.toString());
         editor.putString(key_user, Gson().toJson(user))
         editor.apply();
     }

@@ -71,19 +71,16 @@ class SignUpDialog(val api: TodoApi.UserApi) {
             if (equalPassword(edit_password.text.toString(), edit_password_confirm.text.toString())) {
                 val query = NewUserQuery(edit_username.text.toString(), edit_email.text.toString(), edit_password.text.toString());
                 val error = query.valid(activity.resources)
-                Log.d("text", error.size.toString());
                 if (error.isEmpty()) {
                     activity.observable(api.new(query)
                             , object : Subscriber<NewUserResponse>() {
                         override fun onCompleted() {
-                            Log.d("api", "onCompleted");
                             if (UserService.isLogin(UserService.createSharedPreferences(activity.applicationContext))) {
                                 onSignUpListener?.onComplete()
                             }
                         }
 
                         override fun onNext(response: NewUserResponse) {
-                            Log.d("api", "response:${response.toString()}");
                             when (response.code) {
                                 400 -> {
                                     val errors = response.errors;
@@ -97,8 +94,6 @@ class SignUpDialog(val api: TodoApi.UserApi) {
 
 
                         override fun onError(e: Throwable?) {
-                            Log.d("api", "${e?.message}")
-
                             onSignUpListener?.onError(e)
                         }
                     }) ;
