@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">Todo</string>
+
+    <string name="prompt_email">メール</string>
+    <string name="prompt_username">ユーザ名</string>
+    <string name="prompt_username_or_email">名前かメール</string>
+    <string name="prompt_password">パスワード</string>
+    <string name="action_login">ログイン</string>
+    <string name="action_sign_up">新規登録</string>
+    <string name="error_invalid_email">メールアドレスを入力してください</string>
+    <string name="error_invalid_password">パスワードを入力してください</string>
+    <string name="error_invalid_username">ユーザ名を入力してください</string>
+    <string name="error_incorrect_password">パスワードが一致しません</string>
+    <string name="error_length_between">%1$d文字以上 %2$d文字以下で入力してください</string>
+    <string name="error_blank">入力されていません</string>
+    <string name="prompt_task">ToDoを追加</string>
+    <string name="action_register">登録</string>
+    <string name="welcome">ようこそ！</string>
+    <string name="complete_register_task">ToDoを登録しました</string>
+    <string name="hello">こんにちは！</string>
+    <string name="complete_delete_task">削除完了しました</string>
+    <string name="complete_login">ログインしました</string>
+    <string name="task_complete">完了の一覧</string>
+    <string name="task_untreated">未完了の一覧</string>
+    <string name="task_all">すべて</string>
+    <string name="action_logout">ログアウト</string>
+    <string name="title_sign_up">Sign Up</string>
+    <string name="title_edit_task">ToDo…</string>
+    <string name="action_edit">編集</string>
+    <string name="action_delete">削除</string>
+    <string name="nothing_task">何もTodoはありません</string>
+    <string name="complete_edit_task">編集を完了しました</string>
+    <string name="error_not_found_user">ユーザがいませんでした</string>
+    <string name="prompt_password_confirm">パスワードの確認</string>
+    <string name="error_confirm_password">パスワードが一致しません</string>
+    <string name="title_task_all">すべてのTodo一覧</string>
+    <string name="title_task_untreated">未完了のToDo一覧</string>
+    <string name="title_task_complete">完了のToDo一覧</string>
+
+
+</resources>
