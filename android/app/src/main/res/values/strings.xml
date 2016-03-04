@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Todo</string>
+    <string name="app_name">ToDo</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -13,16 +13,9 @@
     <string name="error_invalid_username">This username is invalid</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_length_between">%1$d文字以上 %2$d文字以下で入力してください</string>
-    <string name="error_blank">入力されていません</string>
-
-
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
-    <string name="prompt_task">todo...</string>
-
-    <string name="action_register">登録</string>
+    <string name="error_blank">blank</string>
+    <string name="prompt_task">ToDo…</string>
+    <string name="action_register">register</string>
     <string name="welcome">Welcome!</string>
     <string name="complete_register_task">Completed.</string>
     <string name="hello">Hello</string>
@@ -33,7 +26,7 @@
     <string name="task_all">All</string>
     <string name="action_logout">Logout</string>
     <string name="title_sign_up">Sign Up</string>
-    <string name="title_edit_task">todo...</string>
+    <string name="title_edit_task">ToD1o…</string>
     <string name="action_edit">edit</string>
     <string name="action_delete">delete</string>
     <string name="nothing_task">Nothing</string>
@@ -41,9 +34,9 @@
     <string name="error_not_found_user">Not Found User</string>
     <string name="prompt_password_confirm">Confirm password</string>
     <string name="error_confirm_password">Not equal password</string>
-    <string name="title_task_all">Todo All Task</string>
-    <string name="title_task_untreated">Todo Untreated Task</string>
-    <string name="title_task_complete">Todo Complete Task</string>
+    <string name="title_task_all">ToDo All Task</string>
+    <string name="title_task_untreated">ToDo Untreated Task</string>
+    <string name="title_task_complete">ToDo Complete Task</string>
 
 
 
