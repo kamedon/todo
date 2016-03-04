@@ -163,10 +163,9 @@ class TaskApiController extends RestController
      *
      * @Route(requirements={"id"="\d+"})
      * @ApiDoc(
-     *     description="タスク変数",
+     *     description="タスク編集",
      *     statusCodes={
      *         200="edit complete",
-     *         400="taskの情報の不備",
      *         403="Header:X-User-Agent-Authorizationの認証失敗 または　apiKeyの認証失敗"
      *     }
      * )
