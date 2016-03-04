@@ -27,7 +27,7 @@ class NewUserFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => '\AppBundle\Entity\NewUserRequest',
+            'data_class' => '\AppBundle\Entity\Query\NewUserQuery',
             'csrf_protection' => false,
         ));
     }

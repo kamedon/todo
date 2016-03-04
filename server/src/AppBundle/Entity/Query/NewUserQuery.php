@@ -6,11 +6,11 @@
  * Time: 9:55 AM
  */
 
-namespace AppBundle\Entity;
+namespace AppBundle\Entity\Query;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
-class NewUserRequest
+class NewUserQuery
 {
 
     /**
