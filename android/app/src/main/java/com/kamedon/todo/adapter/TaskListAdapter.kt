@@ -42,7 +42,6 @@ class TaskListAdapter(val layoutInflater: LayoutInflater, var list: MutableList<
         }
         holder.checkComplete.setOnCheckedChangeListener { compoundButton, b -> }
         val item = getItem(position);
-        Log.d("getView", "update:" + position+item.toString());
         holder.textBody.text = item.body
         holder.checkComplete.isChecked = !item.state.equals("untreated")
         holder.checkComplete.setOnCheckedChangeListener { compoundButton, b ->
