@@ -26,7 +26,6 @@ class UserApiController extends RestController
      *     statusCodes={
      *         200="Returned create token",
      *         403="Header:X-User-Agent-Authorizationの認証失敗",
-     *         400="登録ユーザの情報が間違っている"
      *     }
      * )
      * @param Request $request
@@ -96,7 +95,7 @@ class UserApiController extends RestController
 
     /**
      * @ApiDoc(
-     *     description="ユーザ登録",
+     *     description="ユーザログイン",
      *     statusCodes={
      *         200="Returned create token",
      *         403="Header:X-User-Agent-Authorizationの認証失敗"
