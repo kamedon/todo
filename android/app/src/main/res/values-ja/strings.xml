@@ -28,9 +28,9 @@
     <string name="title_edit_task">ToDo…</string>
     <string name="action_edit">編集</string>
     <string name="action_delete">削除</string>
-    <string name="nothing_task">何もTodoはありません</string>
+    <string name="nothing_task">何もTodoがありません</string>
     <string name="complete_edit_task">編集を完了しました</string>
-    <string name="error_not_found_user">ユーザがいませんでした</string>
+    <string name="error_not_found_user">ユーザまたはパスワードが違います</string>
     <string name="prompt_password_confirm">パスワードの確認</string>
     <string name="error_confirm_password">パスワードが一致しません</string>
     <string name="title_task_all">すべてのTodo一覧</string>
