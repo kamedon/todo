@@ -23,13 +23,13 @@ object ApiClientBuilder {
                             .header("Content-Type", "application/json")
                             .method(original.method(), original.body());
 
-                    Log.d("okhttp", XUserAgentAuthorizationUtil.token());
+//                    Log.d("okhttp", XUserAgentAuthorizationUtil.token());
 
                     api_token?.let {
                         builder.header("Authorization", it)
                     }
                     var response = chain.proceed(builder.build())
-                    Log.d("okhttp", response?.toString());
+//                    Log.d("okhttp", response?.toString());
                     when (response?.code()) {
                         403 -> listener?.onInvalidApiKeyOrNotFoundUser(response)
                     }
