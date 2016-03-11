@@ -1,7 +1,9 @@
 package com.kamedon.todo.builder
 
 import android.util.Log
+import com.kamedon.todo.util.Debug
 import com.kamedon.todo.util.XUserAgentAuthorizationUtil
+import com.kamedon.todo.util.logd
 import okhttp3.Interceptor
 import okhttp3.JavaNetCookieJar
 import okhttp3.OkHttpClient
@@ -23,13 +25,13 @@ object ApiClientBuilder {
                             .header("Content-Type", "application/json")
                             .method(original.method(), original.body());
 
-//                    Log.d("okhttp", XUserAgentAuthorizationUtil.token());
+                    Debug.d("okhttp", "token:${XUserAgentAuthorizationUtil.token()}")
 
                     api_token?.let {
                         builder.header("Authorization", it)
                     }
                     var response = chain.proceed(builder.build())
-//                    Log.d("okhttp", response?.toString());
+                    Debug.d("okhttp", "response:${response?.toString()}")
                     when (response?.code()) {
                         403 -> listener?.onInvalidApiKeyOrNotFoundUser(response)
                     }
