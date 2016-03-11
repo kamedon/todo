@@ -1,17 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
+    tools:context=".TaskActivity">
     <item
         android:id="@+id/nav_untreated"
-        android:icon="@drawable/ic_sort_black_18dp"
         android:title="@string/title_task_untreated" />
     <item
         android:id="@+id/nav_complete"
-        android:icon="@drawable/ic_sort_black_18dp"
         android:title="@string/title_task_complete" />
 
     <item
         android:id="@+id/nav_all"
-        android:icon="@drawable/ic_sort_black_18dp"
         android:title="@string/title_task_all" />
 </menu>
