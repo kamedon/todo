@@ -1,5 +1,6 @@
 package com.kamedon.todo.api
 
+import com.kamedon.todo.BuildConfig
 import com.kamedon.todo.entity.Task
 import com.kamedon.todo.entity.api.*
 import retrofit2.http.*
@@ -10,7 +11,7 @@ import rx.Observable
  */
 object TodoApi {
 
-    val BASE_URL = "http://kamedon39.xyz";
+    val BASE_URL = BuildConfig.TODO_API_BASE_URL;
 
     interface TaskApi {
         @GET("/api/tasks.json")
