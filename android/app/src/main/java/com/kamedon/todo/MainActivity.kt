@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.util.Log
 import com.kamedon.todo.builder.ApiClientBuilder
 import com.kamedon.todo.builder.TodoApiBuilder
 import com.kamedon.todo.dialog.SignUpDialog
@@ -14,6 +13,7 @@ import com.kamedon.todo.entity.api.NewUserResponse
 import com.kamedon.todo.extension.buildIntent
 import com.kamedon.todo.extension.observable
 import com.kamedon.todo.service.UserService
+import com.kamedon.todo.util.logd
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import rx.Subscriber
@@ -52,6 +52,8 @@ class MainActivity : RxAppCompatActivity() {
                     }
 
                     override fun onNext(response: NewUserResponse) {
+                        response.message.logd("api")
+
                         when (response.code) {
                             400 -> Snackbar.make(login_form, R.string.error_not_found_user, Snackbar.LENGTH_LONG).setAction("Action", null).show();
                             200 -> UserService.update(perf.edit(), response)

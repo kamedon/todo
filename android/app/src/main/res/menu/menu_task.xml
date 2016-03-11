@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".TaskActivity">
+    <item
+        android:id="@+id/nav_untreated"
+        android:title="@string/title_task_untreated" />
+    <item
+        android:id="@+id/nav_complete"
+        android:title="@string/title_task_complete" />
+
+    <item
+        android:id="@+id/nav_all"
+        android:title="@string/title_task_all" />
+</menu>

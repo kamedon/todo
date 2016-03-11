@@ -10,6 +10,8 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.AbsListView
@@ -26,6 +28,7 @@ import com.kamedon.todo.entity.api.NewTaskQuery
 import com.kamedon.todo.entity.api.NewTaskResponse
 import com.kamedon.todo.extension.observable
 import com.kamedon.todo.service.UserService
+import com.kamedon.todo.util.Debug
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.content_task.*
@@ -236,6 +239,21 @@ class TaskActivity : RxAppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_task, menu);
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Debug.d("menu", "select: ${item.itemId}")
+        when (item.itemId) {
+            R.id.nav_all -> update(Task.state_all, R.string.title_task_all)
+            R.id.nav_untreated -> update(Task.state_untreated, R.string.title_task_untreated)
+            R.id.nav_complete -> update(Task.state_complete, R.string.title_task_complete)
+        }
+        return true;
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -308,5 +326,6 @@ class TaskActivity : RxAppCompatActivity() {
             layout_register_form.visibility = View.GONE
         }
     }
+
 }
 
