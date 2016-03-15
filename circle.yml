@@ -12,4 +12,5 @@
 #        - ./gradlew test
 test:
   override:
+    - cd android
     - ./gradlew assembleDebug
