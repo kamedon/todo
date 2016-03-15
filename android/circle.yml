@@ -1,17 +1,15 @@
-machine:
-    java:
-        version: openjdk7 # デフォルトはopenjdk7
-    environment:
-        ANDROID_HOME: ~/Applications/android-sdk-macosx # なくてもよい。                                                                                                     
+#machine:
+#    java:
+#        version: openjdk7 # デフォルトはopenjdk7
+#    environment:
+#        ANDROID_HOME: ~/Applications/android-sdk-macosx # なくてもよい。
 
-dependencies:
-    override:
-        - echo y | android update sdk --no-ui --filter "android-23, build-tools-23.0.1" # デフォルトで導入されているパッケージは入れる必要なし。下記参照
+# dependencies:
+#    override:
+#        - echo y | android update sdk --no-ui --filter "android-23, build-tools-23.0.1" # デフォルトで導入されているパッケージは入れる必要なし。下記参照
+#test:
+#    override:
+#        - ./gradlew test
 test:
-    override:
-        - ./gradlew test
-deployment:
-    develop:
-        branch: 3.0.0/test
-        commands:
-            - ./gradlew assembleDebug
+  override:
+    - ./gradlew assembleDebug
